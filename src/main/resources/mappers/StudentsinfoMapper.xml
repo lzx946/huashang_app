@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzx.hsapp.dao.StudentsinfoMapper">
+  <resultMap id="BaseResultMap" type="com.lzx.hsapp.entity.Studentsinfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="photoid" jdbcType="INTEGER" property="photoid" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="realname" jdbcType="VARCHAR" property="realname" />
+    <result column="position" jdbcType="VARCHAR" property="position" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="companyurl" jdbcType="VARCHAR" property="companyurl" />
+    <result column="enname" jdbcType="VARCHAR" property="enname" />
+    <result column="otherposition" jdbcType="VARCHAR" property="otherposition" />
+    <result column="company" jdbcType="LONGVARCHAR" property="company" />
+    <result column="summary" jdbcType="LONGVARCHAR" property="summary" />
+    <result column="motto" jdbcType="LONGVARCHAR" property="motto" />
+    <result column="studentid" jdbcType="VARCHAR" property="studentid"></result>
+    <result column="qrcode" jdbcType="INTEGER" property="qrcode"></result>
+    <result column="wechat" jdbcType="VARCHAR" property="wechat"></result>
+    <result column="area" jdbcType="INTEGER" property="area"></result>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from studentsinfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lzx.hsapp.entity.Studentsinfo">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into studentsinfo (id, email, password, 
+      photoid, phone, account, 
+      realname, position, state, 
+      createtime, companyurl, enname, 
+      otherposition, company, summary,motto,studentid,qrcode,wechat,area
+      )
+    values (#{id,jdbcType=INTEGER}, #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{photoid,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR}, 
+      #{realname,jdbcType=VARCHAR}, #{position,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, 
+      #{createtime,jdbcType=TIMESTAMP}, #{companyurl,jdbcType=VARCHAR}, #{enname,jdbcType=VARCHAR},
+      #{otherposition,jdbcType=VARCHAR}, #{company,jdbcType=LONGVARCHAR}, #{summary,jdbcType=LONGVARCHAR},#{motto,jdbcType=VARCHAR},
+      #{studentid,jdbcType=VARCHAR},#{qrcode,jdbcType=INTEGER},#{wechat,jdbcType=VARCHAR},#{area,jdbcType=INTEGER}
+    )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lzx.hsapp.entity.Studentsinfo">
+    update studentsinfo
+    <trim prefix="set" suffixOverrides=",">
+      <if test="email!=null">  email= #{email,jdbcType=VARCHAR},</if>
+      <if test="password!=null">password = #{password,jdbcType=VARCHAR},</if>
+      <if test="photoid!=null">  photoid = #{photoid,jdbcType=INTEGER},</if>
+      <if test="phone!=null"> phone = #{phone,jdbcType=VARCHAR},</if>
+      <if test="account!=null"> account = #{account,jdbcType=VARCHAR},</if>
+      <if test="realname!=null"> realname = #{realname,jdbcType=VARCHAR},</if>
+      <if test="position!=null"> position = #{position,jdbcType=VARCHAR},</if>
+      <if test="state!=null">state = #{state,jdbcType=INTEGER},</if>
+      <if test="createtime!=null"> createtime = #{createtime,jdbcType=TIMESTAMP},</if>
+      <if test="companyurl!=null">companyurl = #{companyurl,jdbcType=INTEGER},</if>
+      <if test="company!=null">company = #{company,jdbcType=LONGVARCHAR},</if>
+      <if test="summary!=null">summary = #{summary,jdbcType=LONGVARCHAR},</if>
+      <if test="enname!=null"> enname = #{enname,jdbcType=VARCHAR},</if>
+      <if test="otherposition!=null">otherposition = #{otherposition,jdbcType=VARCHAR},</if>
+      <if test="motto!=null">motto = #{motto,jdbcType=VARCHAR},</if>
+      <if test="qrcode!=null">qrcode = #{qrcode,jdbcType=INTEGER},</if>
+      <if test="studentid!=null">studentid=#{studentid,jdbcType=VARCHAR},</if>
+      <if test="wechat!=null">wechat=#{wechat,jdbcType=VARCHAR},</if>
+      <if test="area!=null"> area=#{area,jdbcType=INTEGER}</if>
+    </trim>
+    where 1=1
+    <if test="id!=null">
+      and  id = #{id,jdbcType=INTEGER}
+    </if>
+    <if test="phone!=null">
+      and phone=#{phone,jdbcType=VARCHAR}
+    </if>
+  </update>
+  <select id="selectByPrimaryKey" parameterType="com.lzx.hsapp.entity.Studentsinfo" resultMap="BaseResultMap">
+    select id, email, photoid, phone, account, realname, position, state, createtime,
+    companyurl, enname, otherposition, company, summary,motto,studentid,wechat,qrcode,area
+    from studentsinfo
+    where 1=1
+    <if test="id!=null">
+      and id = #{id,jdbcType=INTEGER}
+    </if>
+    <if test="realname!=null">
+      and realname=#{realname,jdbcType=VARCHAR}
+    </if>
+    <if test="phone!=null">
+      and phone = #{phone,jdbcType=VARCHAR}
+    </if>
+    ORDER BY createtime DESC
+  </select>
+
+  <select id="selectByAccountEmail" parameterType="com.lzx.hsapp.entity.Studentsinfo" resultMap="BaseResultMap">
+    select a.id, email, a.photoid, phone, account, realname, position, state, createtime,
+    companyurl, enname, otherposition, company, summary,motto,studentid,wechat,qrcode,area
+    from studentsinfo a
+    <where>
+      <if test="id != null and id != ''">
+        AND  id = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="account != null and account != ''">
+       AND  account = #{account,jdbcType=VARCHAR}
+      </if>
+      <if test="email != null and email != ''">
+        AND  email = #{email,jdbcType=VARCHAR}
+      </if>
+      <if test="password != null and password != ''">
+        AND  password = #{password,jdbcType=VARCHAR}
+      </if>
+      <if test="phone != null and phone != ''">
+        AND  phone = #{phone,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+  <select id="selectAll" parameterType="com.lzx.hsapp.entity.StudentsVoinfo" resultType="com.lzx.hsapp.entity.StudentsVoinfo">
+    select a.id, email, photoid, phone, account, realname, position, state, createtime,
+    companyurl, enname, otherposition, company, summary,url ,motto,studentid,wechat,qrcode,area
+    from studentsinfo a LEFT JOIN sys_file b ON a.photoid=b.id where a.state=1
+    <if test="id!=null">
+      and a.id=#{id}
+    </if>
+    <if test="id==null">
+      and a.realname is NOT NULL
+    </if>
+    ORDER BY a.createtime DESC
+  </select>
+</mapper>

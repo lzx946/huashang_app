@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzx.hsapp.dao.CommentMapper">
+  <resultMap id="BaseResultMap" type="com.lzx.hsapp.entity.Comment">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="cid" jdbcType="INTEGER" property="cid" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="iscommend" jdbcType="INTEGER" property="iscommend" />
+  </resultMap>
+  <resultMap id="CidResultMap" type="com.lzx.hsapp.entity.CommentDetail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="cid" jdbcType="INTEGER" property="cid" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="realname" jdbcType="VARCHAR" property="commentName" />
+    <result column="url" jdbcType="VARCHAR" property="imgUrl" />
+    <result column="iscommend" jdbcType="INTEGER" property="iscommend" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lzx.hsapp.entity.Comment">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into comment ( cid, uid,
+      state, createtime, content,iscommend
+      )
+    values (#{cid,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER},
+      #{state,jdbcType=INTEGER}, #{createtime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, #{iscommend,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lzx.hsapp.entity.Comment">
+    update comment
+    set cid = #{cid,jdbcType=INTEGER},
+      uid = #{uid,jdbcType=INTEGER},
+      state = #{state,jdbcType=INTEGER},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR}
+      iscommend = #{iscommend,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, cid, uid, state, createtime, content,iscommend
+    from comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByCid" parameterType="java.lang.Integer" resultMap="CidResultMap">
+    select a.id, a.cid, a.uid, a.state, a.createtime, a.content,b.realname,c.url,a.iscommend
+    from comment a
+    LEFT JOIN studentsinfo b ON a.uid=b.id
+    LEFT JOIN sys_file c ON b.photoid=c.id
+    where cid = #{cid,jdbcType=INTEGER} AND a.state=0
+    ORDER BY a.createtime DESC
+  </select>
+
+  <select id="selectAll" parameterType="java.lang.Integer" resultMap="CidResultMap">
+    select a.id, a.cid, a.uid, a.state, a.createtime, a.content,b.realname,c.url,a.iscommend
+    from comment a
+    LEFT JOIN studentsinfo b ON a.uid=b.id
+    LEFT JOIN sys_file c ON b.photoid=c.id
+    WHERE a.state=0
+    <if test="_parameter!=null">
+      and iscommend=#{_parameter,jdbcType=INTEGER}
+    </if>
+    ORDER BY createtime DESC
+  </select>
+</mapper>

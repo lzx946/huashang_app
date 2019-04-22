@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzx.hsapp.dao.CourseMapper">
+    <resultMap id="BaseResultMap" type="com.lzx.hsapp.entity.Course">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="room" jdbcType="VARCHAR" property="room"/>
+        <result column="teacherid" jdbcType="INTEGER" property="teacherid"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="posterid" jdbcType="INTEGER" property="posterid"/>
+        <result column="content" jdbcType="INTEGER" property="content"/>
+        <result column="starttime" jdbcType="TIMESTAMP" property="starttime"/>
+        <result column="stoptime" jdbcType="TIMESTAMP" property="stoptime"/>
+        <result column="reason" jdbcType="VARCHAR" property="reason"/>
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="period" jdbcType="VARCHAR" property="period"/>
+        <result column="classroom" jdbcType="VARCHAR" property="classroom"/>
+        <result column="summary" jdbcType="LONGVARCHAR" property="summary"/>
+    </resultMap>
+
+    <resultMap id="HomeDataResultMap" type="com.lzx.hsapp.entity.HomeData">
+        <id column="id" jdbcType="INTEGER" property="courseId"/>
+        <result column="name" jdbcType="VARCHAR" property="courseName"/>
+        <result column="room" jdbcType="VARCHAR" property="courseLocal"/>
+        <result column="teacherid" jdbcType="INTEGER" property="expertId"/>
+        <result column="starttime" jdbcType="TIMESTAMP" property="courseStartTime"/>
+        <result column="stoptime" jdbcType="TIMESTAMP" property="courseStopTime"/>
+        <result column="period" jdbcType="VARCHAR" property="stage"/>
+        <result column="classroom" jdbcType="VARCHAR" property="ban"/>
+        <result column="realname" jdbcType="VARCHAR" property="expertName"/>
+        <result column="academic" jdbcType="VARCHAR" property="expertAcademic"/>
+        <result column="url" jdbcType="VARCHAR" property="imgUrl"/>
+        <result column="codeflagname" jdbcType="VARCHAR" property="codeflagname"/>
+    </resultMap>
+    <resultMap id="HomeDataDetailResultMap" type="com.lzx.hsapp.entity.HomeDataDetail">
+        <id column="id" jdbcType="INTEGER" property="courseId"/>
+        <result column="name" jdbcType="VARCHAR" property="courseName"/>
+        <result column="room" jdbcType="VARCHAR" property="courseLocal"/>
+        <result column="teacherid" jdbcType="INTEGER" property="expertId"/>
+        <result column="starttime" jdbcType="TIMESTAMP" property="courseStartTime"/>
+        <result column="stoptime" jdbcType="TIMESTAMP" property="courseStopTime"/>
+        <result column="period" jdbcType="VARCHAR" property="stage"/>
+        <result column="classroom" jdbcType="VARCHAR" property="ban"/>
+        <result column="realname" jdbcType="VARCHAR" property="expertName"/>
+        <result column="courseSummary" jdbcType="VARCHAR" property="courseSummary"/>
+        <result column="expertSummary" jdbcType="VARCHAR" property="expertSummary"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from course
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.lzx.hsapp.entity.Course">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into course (id, name, room,
+        teacherid, state, type,
+        posterid, content, starttime,
+        stoptime, reason, createtime,
+        period, classroom, summary
+        )
+        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{room,jdbcType=VARCHAR},
+        #{teacherid,jdbcType=INTEGER}, #{state,jdbcType=INTEGER}, #{type,jdbcType=INTEGER},
+        #{posterid,jdbcType=INTEGER}, #{content,jdbcType=INTEGER}, #{starttime,jdbcType=TIMESTAMP},
+        #{stoptime,jdbcType=TIMESTAMP}, #{reason,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP},
+        #{period,jdbcType=VARCHAR}, #{classroom,jdbcType=VARCHAR}, #{summary,jdbcType=LONGVARCHAR}
+        )
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.lzx.hsapp.entity.Course">
+        update course
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null">  title = #{name,jdbcType=VARCHAR},</if>
+            <if test="room!=null">  room = #{room,jdbcType=VARCHAR},</if>
+            <if test="teacherid!=null">  teacherid = #{teacherid,jdbcType=INTEGER},</if>
+            <if test="state!=null">  state = #{state,jdbcType=INTEGER},</if>
+            <if test="type!=null">  type = #{type,jdbcType=INTEGER},</if>
+            <if test="posterid!=null">  posterid = #{posterid,jdbcType=INTEGER},</if>
+            <if test="content!=null">  content = #{content,jdbcType=INTEGER},</if>
+            <if test="starttime!=null">  starttime = #{starttime,jdbcType=TIMESTAMP},</if>
+            <if test="stoptime!=null">  stoptime = #{stoptime,jdbcType=TIMESTAMP},</if>
+            <if test="createtime!=null">  createtime = #{createtime,jdbcType=TIMESTAMP},</if>
+            <if test="summary!=null">  summary = #{summary,jdbcType=VARCHAR},</if>
+            <if test="period!=null">period=#{period,jdbcType=VARCHAR},</if>
+            <if test="reason!=null"> reason=#{reason,jdbcType=VARCHAR},</if>
+            <if test="classroom!=null">classroom=#{classroom,jdbcType=VARCHAR},</if>
+        </trim>
+        where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultType="com.lzx.hsapp.entity.Course">
+    select id, name, room, teacherid, state, type, posterid, content, starttime, stoptime,
+    reason, createtime, period, classroom, summary
+    from course
+    where id = #{id,jdbcType=INTEGER}
+    ORDER BY createtime DESC
+  </select>
+
+    <select id="selectAll" parameterType="com.lzx.hsapp.entity.CourseVo" resultType="com.lzx.hsapp.entity.CourseVo">
+    select name,a.id,  teacherid,starttime, stoptime,a.createtime,a.summary,b.realname,b.academic,b.employer,c.url
+    from course a  LEFT JOIN expertsinfo b ON a.teacherid=b.id
+    LEFT JOIN sys_file c ON b.photoid=c.id
+    LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+     where a.state=1 and b.state=1 and d.code=100
+     <if test="id!=null">
+         and a.id=#{id}
+     </if>
+      <if test="teacherid!=null">
+            and a.teacherid=#{teacherid}
+      </if>
+     group by name,realname
+     order by a.iscommend ASC,a.starttime DESC
+  </select>
+
+    <select id="selectByteach" parameterType="com.lzx.hsapp.entity.CourseVo" resultType="com.lzx.hsapp.entity.CourseVo">
+        select a.id, room, starttime, stoptime,a.createtime,a.period,d.codeflagname
+        from course a LEFT JOIN expertsinfo b ON a.teacherid=b.id
+        LEFT JOIN sys_file c ON b.photoid=c.id
+        LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        where a.state=1 and b.state=1 and d.code=100
+        <if test="teacherid!=null">
+            and a.teacherid=#{teacherid}
+        </if>
+        <if test="name!=null and name!=''">
+            and name=#{name}
+        </if>
+        order by a.iscommend ASC,a.starttime DESC
+    </select>
+
+
+    <select id="selectHomeData" resultMap="HomeDataResultMap">
+        (select a.id, a.name, a.room, a.teacherid, a.starttime, a.stoptime,
+        a.period, a.classroom,b.realname,b.academic,c.url,d.codeflagname,a.iscommend
+        from course a
+        LEFT JOIN expertsinfo b ON a.teacherid=b.id
+        LEFT JOIN sys_file c ON b.photoid=c.id
+        LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        WHERE a.state=1 AND b.state=1 AND a.starttime >= NOW() AND a.iscommend=0 AND d.code=100 ORDER BY a.starttime ASC limit 6) UNION
+        (select a.id, a.name, a.room, a.teacherid, a.starttime, a.stoptime,
+        a.period, a.classroom,b.realname,b.academic,c.url,d.codeflagname,a.iscommend
+        from course a
+        LEFT JOIN expertsinfo b ON a.teacherid=b.id
+        LEFT JOIN sys_file c ON b.photoid=c.id
+        LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        WHERE a.state=1 AND b.state=1 AND NOW() > a.starttime  AND a.iscommend=0  AND d.code=100 ORDER BY a.starttime DESC ) limit 6
+    </select>
+    <select id="selectHomeDataList" resultMap="HomeDataResultMap">
+        (select a.id, a.name, a.room, a.teacherid, a.starttime, a.stoptime,
+        a.period, a.classroom,b.realname,b.academic,c.url,d.codeflagname,a.iscommend
+        from course a
+        LEFT JOIN expertsinfo b ON a.teacherid=b.id
+        LEFT JOIN sys_file c ON b.photoid=c.id
+         LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        WHERE a.state=1 AND b.state=1 AND a.starttime >= NOW() AND d.code=100 ORDER BY a.starttime ASC limit 6) UNION
+        (select a.id, a.name, a.room, a.teacherid, a.starttime, a.stoptime,
+        a.period, a.classroom,b.realname,b.academic,c.url,d.codeflagname,a.iscommend
+        from course a
+        LEFT JOIN expertsinfo b ON a.teacherid=b.id
+        LEFT JOIN sys_file c ON b.photoid=c.id
+         LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        WHERE a.state=1 AND b.state=1 AND NOW() > a.starttime AND d.code=100  ORDER BY a.starttime DESC )
+    </select>
+    <select id="selectHomeDataDetail"  parameterType="java.lang.Integer" resultMap="HomeDataDetailResultMap">
+        select a.id, a.name, a.room, a.teacherid, a.starttime, a.stoptime,
+        a.period, a.classroom ,a.summary AS courseSummary,b.realname,b.summary AS expertSummary,d.codeflagname,a.iscommend
+        from course a
+        LEFT JOIN expertsinfo b ON a.teacherid=b.id
+         LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        WHERE a.id=#{id,jdbcType=INTEGER} AND a.state=1 AND b.state=1 AND d.code=100
+    </select>
+    <select id="selectCoursebyteacher"  parameterType="java.lang.Integer" resultMap="BaseResultMap">
+         select a.id, a.name, a.room, a.teacherid, a.starttime, a.stoptime,state,createtime,
+        a.period, a.classroom ,a.summary,d.codeflagname,a.iscommend from course a   LEFT JOIN sys_dictionary d ON d.codeflag=a.classroom
+        WHERE teacherid=#{teacherid,jdbcType=INTEGER} AND d.code=100 and a.state=1
+        ORDER BY a.iscommend ASC,a.createtime DESC
+    </select>
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT
+            LAST_INSERT_ID()
+        </selectKey>
+        insert into course (id, name, room,
+        teacherid, state, type,
+        posterid, content, starttime,
+        stoptime, reason, createtime,
+        period, classroom, summary
+        )values
+        <foreach collection="list" item="wdSolr" index="index"
+                 separator=",">
+            (
+            #{wdSolr.id},#{wdSolr.name},#{wdSolr.room},#{wdSolr.teacherid},
+            #{wdSolr.state},#{wdSolr.type},#{wdSolr.posterid},#{wdSolr.content},
+            #{wdSolr.starttime},#{wdSolr.stoptime},#{wdSolr.reason},#{wdSolr.createtime},
+            #{wdSolr.period},#{wdSolr.classroom},#{wdSolr.summary}
+            )
+        </foreach>
+    </insert>
+</mapper>

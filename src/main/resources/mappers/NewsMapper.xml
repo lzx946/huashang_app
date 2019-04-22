@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzx.hsapp.dao.NewsMapper">
+  <resultMap id="BaseResultMap" type="com.lzx.hsapp.entity.News">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="photoid" jdbcType="VARCHAR" property="photoid" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from news
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lzx.hsapp.entity.News">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into news (id, title, state, 
+      photoid, createtime, content,iscommend
+      )
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, 
+      #{photoid,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR},#{iscommend,jdbcType=INTEGER}
+    )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lzx.hsapp.entity.News">
+    update news
+    set title = #{title,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      photoid = #{photoid,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR},iscommend=#{iscommend,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultType="com.lzx.hsapp.entity.News">
+    select a.id, title, state, photoid, createtime, content,iscommend,url
+    from news a LEFT JOIN sys_file b ON a.photoid=b.id
+    where a.id = #{id,jdbcType=INTEGER}
+    ORDER BY createtime DESC
+  </select>
+  <select id="selectAll" parameterType="com.lzx.hsapp.entity.News" resultType="com.lzx.hsapp.entity.News">
+  select a.id, title, state, photoid, createtime, content,iscommend,url
+  from news a LEFT JOIN sys_file b ON a.photoid=b.id
+  where state=0
+  <if test="id!=null">
+    and a.id=#{id}
+  </if>
+  <if test="iscommend!=null">
+    and iscommend=#{iscommend}
+  </if>
+  ORDER BY a.iscommend ASC,a.createtime DESC
+</select>
+  <select id="homeNews" parameterType="java.lang.Integer" resultType="com.lzx.hsapp.entity.News">
+    select a.id, title, state, photoid, createtime,content,iscommend,url
+    from news a LEFT JOIN sys_file b ON a.photoid=b.id
+    where state=0 and a.iscommend=#{iscommend,jdbcType=INTEGER}
+    ORDER BY a.iscommend ASC,a.createtime DESC
+  </select>
+</mapper>

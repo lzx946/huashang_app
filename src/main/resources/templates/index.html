@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="img/logo.png">
+    <title>欧洲华商商学院</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/loading.css" rel="stylesheet">
+    <link href="css/lib/tooltipmy.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="https://cdn.bootcss.com/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+</head>
+
+<style>
+    [v-cloak] {
+        display: none;
+    }
+
+    body {
+        /*min-height: 2000px;*/
+    }
+
+    .navbar-static-top {
+        margin-bottom: 19px;
+    }
+
+    .tsama-nav-box-shadow {
+        box-shadow: 1px 1px 10px #000000;
+        /*opacity: 0.5;
+        background-color: rgba(0, 0, 0, .5);
+        border: #CCCCCC;*/
+    }
+
+    .tsama-navbar-header-height {
+        height: 75px;
+    }
+
+    .tsama-nav-button-top {
+        margin-top: 21px;
+    }
+
+    .tsama-logo {
+        margin-top: 20px;
+        height: 100px;
+    }
+
+    .tsama-backimg {
+        position: absolute;
+        z-index: -1;
+        background: url(img/itback1.jpg) no-repeat center;
+        height: 800px;
+        width: 100%;
+        top: 0;
+    }
+
+    .tsama-backimg:after {
+        display: block;
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        content: "";
+    }
+
+    .tsama-show-text-tip {
+        padding-top: 150px;
+        font-size: 2em;
+        color: white;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+
+    .tsama-main {
+        border: 1px solid #DCDCDC;
+        min-height: 500px;
+        margin-top: 150px;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        z-index: 100;
+        background: #FFFFFF;
+        border-radius: 5px;
+    }
+
+    .tsama-label {
+        width: 50px;
+        height: 50px;
+        font-size: 100%;
+        padding: .8em .9em .8em;
+    }
+
+    .tsama-line {
+        margin-top: 1.6em;
+        height: 1px;
+        border: 1px solid #CCCCCC;
+    }
+
+    .tsama-main-img-div-top {
+        margin-top: 1em;
+    }
+
+    .tsama-course {
+        /* Safari */
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+    }
+
+    .tsama-course:hover {
+        box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.34), 0px 0px 20px 0 rgba(0, 0, 0, 0.39);
+    }
+
+    .h1,
+    .h2,
+    .h3,
+    h1,
+    h2,
+    h3 {
+        margin-top: 0px;
+        margin-bottom: 10px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tsama-enter {
+        width: 100%;
+    }
+
+    .tsama-enter span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    .tsama-enter span:after {
+        content: '>>';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+
+    .tsama-enter:hover span {
+        padding-right: 25px;
+    }
+
+    .tsama-enter:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+
+    .img-box-shadow {
+        /* Safari */
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+    }
+
+    .img-box-shadow:hover {
+        cursor: pointer;
+        box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.34), 0px 0px 10px 0 rgba(0, 0, 0, 0.39);
+    }
+
+    .my-nav-left {
+        margin-bottom: 15px;
+        margin-top: 15px;
+        margin-left: 20px;
+        list-style: none;
+    }
+
+    .my-nav-right {
+        margin-top: 15px;
+        float: right;
+    }
+
+    .my-nav-left li {
+        height: 50px;
+        padding: 15px;
+    }
+
+    .my-nav-left li a {
+        transition: background 0.5s;
+        -moz-transition: background 0.5s;
+        /* Firefox 4 */
+        -webkit-transition: background 0.5s;
+        /* Safari and Chrome */
+        -o-transition: background 0.5s;
+        /* Opera */
+        color: white;
+        padding: 10px;
+        text-decoration: none;
+        background: transparent;
+        border-radius: 5px;
+    }
+
+    .my-nav-left li a:hover {
+        background: rgba(220, 220, 220, 0.4) !important;
+        color: #5bc0de;
+    }
+
+    .my-nav-right > li > a {
+        background: transparent;
+        transition: background 0.5s;
+        -moz-transition: background 0.5s;
+        /* Firefox 4 */
+        -webkit-transition: background 0.5s;
+        /* Safari and Chrome */
+        -o-transition: background 0.5s;
+        /* Opera */
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .my-nav-right > li > a:hover {
+        background: rgba(220, 220, 220, 0.4);
+        color: #5bc0de;
+    }
+
+    .navclick {
+        background: rgba(220, 220, 220, 0.4);
+        color: #5bc0de;
+        border-radius: 5px;
+    }
+
+    html {
+    }
+
+    footer {
+        margin-top: 2em;
+        height: 80px;
+        background: #000000;
+    }
+
+    .tsama-addimg {
+        height: 40px;
+        position: absolute;
+        right: 20px;
+        top: 50px;
+        transition: All 0.5s ease-in-out;
+        -webkit-transition: All 0.5s ease-in-out;
+        -moz-transition: All 0.5s ease-in-out;
+        -o-transition: All 0.5s ease-in-out;
+    }
+
+    .tsama-addimg-click {
+        /* Rotate div */
+        transform: rotate(135deg);
+        -ms-transform: rotate(135deg);
+        /* Internet Explorer */
+        -moz-transform: rotate(135deg);
+        /* Firefox */
+        -webkit-transform: rotate(135deg);
+        /* Safari 和 Chrome */
+        -o-transform: rotate(135deg);
+        /* Opera */
+    }
+
+    .nav-phone {
+        position: absolute;
+        right: 120px;
+        top: 80px;
+        height: 30em;
+    }
+
+    .dropdown-menu > li > a {
+        padding: 8px 20px;
+    }
+
+    /*动画*/
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity .8s;
+    }
+
+    .fade-enter,
+    .fade-leave-to {
+        opacity: 0;
+    }
+
+    /*======================以下为金牌专家样式列表======================*/
+
+    .tsama-expert-list-p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: opacity 0.5s;
+    }
+
+    .tsama-expert-img {
+        height: 15em;
+        width: 15em;
+        float: right;
+        margin: 1em 3em;
+        border-radius: 5px;
+        /* Safari */
+        -webkit-transition-duration: 0.5s;
+        /*transition-duration: 1s;*/
+        transition: 0.5s;
+    }
+
+    .tsama-expert-img:hover {
+        box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.14), 0px 0px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    /*=================================================================*/
+    /*======================以下为华商学员样式列表======================*/
+
+    .tsama-main-item-div {
+        width: 80%;
+        height: 17em;
+        margin: 0 auto;
+        border-radius: 5px;
+        position: relative;
+        padding: 1em;
+        background: #ECECEC;
+        /* Safari */
+        -webkit-transition-duration: 0.5s;
+        /*transition-duration: 1s;*/
+        transition: 0.5s;
+    }
+
+    .tsama-main-item-div:hover {
+        box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.14), 0px 0px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    /*=================================================================*/
+    /*======================以下为华商学习样式列表======================*/
+
+    .tsama-main-item-study-div {
+        width: 80%;
+        height: 12em;
+        margin: 2em auto;
+        border-radius: 5px;
+        position: relative;
+        padding: 0.8em;
+        background: #ECECEC;
+        /* Safari */
+        -webkit-transition-duration: 0.5s;
+        /*transition-duration: 1s;*/
+        transition: 0.5s;
+    }
+
+    .tsama-main-item-study-div:hover {
+        box-shadow: 0px 0px 20px 0 rgba(0, 0, 0, 0.14), 0px 0px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    /*=================================================================*/
+
+    .tsama-select-ban:hover {
+        background: #5BC0DE;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+<div id="app">
+    <!--====遮罩层、加载中&选择课程===-->
+    <div class="modal fade bs-example-modal-lg" v-bind:class="showLoadingCss" v-on:dblclick="hideLoading()">
+        <div class="spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+        </div>
+    </div>
+    <!--====================-->
+    <nav>
+        <div class="container">
+            <!--<div v-if="isPhoneFlag">-->
+                <!--&lt;!&ndash;手机端登录之后&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="my-nav-right">-->
+                    <!--<div>-->
+                        <!--<div class="wrapper" style="width: 100px;height: 50px;margin-left: auto;margin-right: auto;margin-top: 25px;">-->
+                            <!--<img src="img/course/course_1.jpeg" class="tsama-icon " style="height: 50px;margin-left: 25px;-->
+                                <!--border-radius: 50%; background: rgba(220,220,220,0.4);cursor: pointer;" />-->
+                            <!--<div class="tooltipmy">-->
+                                <!--<div style="width: 100px;height: auto; margin-left: -20px;margin-top: -30px;">-->
+                                    <!--<div class="btn-group">-->
+                                        <!--<ul class="dropdown-menu" style="display: block;min-width: 100px;border: none;">-->
+                                            <!--<li style="border: none;">-->
+                                                <!--<a href="#" style="text-align: center; border: none;">个人中心</a>-->
+                                            <!--</li>-->
+                                            <!--<li role="separator" class="divider"></li>-->
+                                            <!--<li style="border: none;">-->
+                                                <!--<a href="#" style="text-align: center;border: none;">注销</a>-->
+                                            <!--</li>-->
+                                        <!--</ul>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>&ndash;&gt;-->
+                <!--<img src="img/add.png" class="tsama-addimg" v-bind:class="{'tsama-addimg-click':transformFlag}"-->
+                     <!--v-on:click="transformFlag=!transformFlag"/>-->
+                <!--<transition name="fade">-->
+                    <!--<div class="nav-phone" v-if="transformFlag">-->
+                        <!--<div class="btn-group">-->
+                            <!--<ul class="dropdown-menu" style="display: block;min-width: 0px;">-->
+                                <!--<li>-->
+                                    <!--<a href="#">首页</a>-->
+                                <!--</li>-->
+                                <!--<li>-->
+                                    <!--<a href="#">金牌专家</a>-->
+                                <!--</li>-->
+                                <!--<li>-->
+                                    <!--<a href="#">华商学员</a>-->
+                                <!--</li>-->
+                                <!--<li>-->
+                                    <!--<a href="#">华商学习</a>-->
+                                <!--</li>-->
+                                <!--<li>-->
+                                    <!--<a href="#">热点新闻</a>-->
+                                <!--</li>-->
+                                <!--<li role="separator" class="divider"></li>-->
+                                <!--<li>-->
+                                    <!--<a href="#">登录</a>-->
+                                <!--</li>-->
+                                <!--<li>-->
+                                    <!--<a href="#">注册</a>-->
+                                <!--</li>-->
+                            <!--</ul>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</transition>-->
+            <!--</div>-->
+            <div style="float: left;"><img src="img/logo.png" class="tsama-logo"/></div>
+            <div style="height: 120px;">
+                <div id="navbar" v-bind:class="{collapse:isPhoneFlag}" style="margin-top: 32px;">
+                    <ul class="navbar-nav my-nav-left ">
+                        <li role="presentation" v-on:click="navClickT(0)">
+                            <a href="#"
+                               v-bind:style="nowNavIndex==0?navClickCss:''">主&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;页</a>
+                        </li>
+                        <li role="presentation" v-on:click="navClickT(1)">
+                            <a href="#" v-bind:style="nowNavIndex==1?navClickCss:''">金牌专家</a>
+                        </li>
+                        <li role="presentation" v-on:click="navClickT(2)">
+                            <a href="#" v-bind:style="nowNavIndex==2?navClickCss:''">华商学员</a>
+                        </li>
+                        <li role="presentation" v-on:click="navClickT(3)">
+                            <a href="#" v-bind:style="nowNavIndex==3?navClickCss:''">华商学习</a>
+                        </li>
+                        <li role="presentation" v-on:click="navClickT(4)">
+                            <a href="#" v-bind:style="nowNavIndex==4?navClickCss:''">热点新闻</a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav my-nav-left navbar-right my-nav-right" v-if="!isLoginFlag">
+
+                        <li>
+                            <a href="html/login.html" target="_blank">登录</a>
+                        </li>
+                        <li>
+                            <a href="html/register.html" target="_blank">注册</a>
+                        </li>
+                    </ul>
+                    <!--登录完成-->
+                    <div class=" my-nav-right" v-if="isLoginFlag" >
+                        <div>
+                            <div class="wrapper" style="width: 100px;height:50px;margin-left: auto;margin-right: auto;">
+                                <img :src="tokenV.url" class="tsama-icon " style="height: 50px;width: 50px; margin-left: 25px;
+                                border-radius: 50%; background: rgba(220,220,220,0.4);cursor: pointer;" />
+                                <div class="tooltipmy">
+                                    <div style="width: 100px;height: auto; margin-left: -20px;margin-top: -30px;">
+                                        <div class="btn-group">
+                                            <ul class="dropdown-menu" style="display: block;min-width: 100px;border: none;">
+                                                <li style="border: none;">
+                                                    <a @click="toInfo()" style="text-align: center; border: none;cursor: pointer">个人中心</a>
+                                                </li>
+                                                <li role="separator" class="divider"></li>
+                                                <li style="border: none;">
+                                                    <a @click="logout()" style="text-align: center;border: none;cursor:pointer;">注销</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="tsama-backimg"></div>
+    <div>
+        <p class="tsama-show-text-tip">
+            欧洲华商商学院<br/><i>EUROPE</i></p>
+    </div>
+    <div class="container tsama-main" v-cloak style="min-width: 970px;">
+        <span class="label label-info tsama-label">{{navTitle}}</span>
+        <!-- 首页 -->
+        <div v-if="homeFlag">
+            <a href="#" style="float: right;margin-top: -3em;">查看更多>></a>
+            <div class="tsama-line"></div>
+            <div class="row tsama-main-img-div-top">
+                <div class="col-sm-12 col-md-12 " v-for="item in homeData">
+                    <div class="thumbnail tsama-course">
+                        <div style="background: #ECECEC;min-height: 500px;overflow: hidden;">
+                            <div style="float: left;width: 50%;;">
+                                <!-- top -->
+                                <div style="padding: 1em;">
+                                    <img src="img/logo.png" style="height: 5em;float: left;"/>
+                                    <span style="line-height: 3.5em;margin-left: 1em;font-size: 1.5em;"><b>欧洲华商商学院，华商自己的商学院</b></span>
+                                </div>
+                                <div style="margin-top: -15px;">
+                                    <span style="margin-left: 1.5em;font-size: 3em;font-family:'方正舒体';"><b>诚邀</b></span>
+                                </div>
+                                <div style="width: 90%;margin-left: 3em;text-indent: 3em;">
+                                            <span style="font-family: '华文隶书';font-size: 2.2em;">{{item.expertAcademic}}
+                                                <a v-on:click='toExpertDetail(item.expertId)' style="cursor: pointer;">{{item.expertName}} </a>莅临意大利授课:</span>
+                                </div>
+                                <div style="margin-left: 2em;width: 90%;text-align: center;padding: 1em 0;">
+                                    <span style="font-family: '楷体';font-size: 2em;"><a
+                                            v-on:click='toCourseDetail(item.courseId)' style="cursor: pointer;"><b>“{{item.courseName}}”</b></a></span>
+                                </div>
+                                <div style="padding: 1em 2em 0 3em; width: 90%;">
+                                    <p style="font-family: '楷体';font-size: 1.5em;">
+                                        <b>欧洲华商商学院第{{item.stage}}期高级研修班课程安排：</b></p>
+                                    <div style="margin-top: 1.5em;">
+                                        <p style="font-family: '楷体';font-size: 1.7em;color: #AC2925;">
+                                            <b>{{item.ban}}：<span>{{item.courseStartTimeStr}}-{{item.courseStopTimeStr}}</span></b>
+                                        </p>
+                                        <p style="font-family: '楷体';font-size: 1.7em;color: #AC2925;"><b>地点：<span>{{item.courseLocal}}</span></b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width: 50%;height:100%;float: right;">
+                                <img :src="item.imgUrl" style="width:100%;max-height: 500px"/>
+                            </div>
+                            <a v-on:click='nowEnter(item.courseId)' class="btn btn-primary tsama-enter"
+                               style="margin-top: 30px" data-toggle="modal" data-target=".bs-example-modal-sm" v-if="isShowNowEnlist(item.courseStopTime)"
+                               role="button"><span>立即报名 </span></a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!--<div class="row tsama-main-img-div-top">
+                <div class="col-sm-6 col-md-6 " v-for="item in homeData">
+                    <div class="thumbnail tsama-course">
+                        <img v-bind:src="item.coursePosterUrl" class="img-box-shadow" alt="">
+                        <div class="caption">
+                            <a v-on:click='toCourseDetail(item.courseId)' style="cursor: pointer;">
+                                <h3 v-bind:title="item.courseName">“{{item.courseName}}”</h3>
+                            </a>
+                            <p>
+                                <span>专家：</span>
+                                <a v-on:click='toExpertDetail(item.expertId)' style="cursor: pointer;">
+                                    <strong>{{item.expertName}}</strong>
+                                </a>
+                                <strong>&nbsp;&nbsp;&nbsp;&nbsp;{{item.expertAcademic}}</strong>
+                            </p>
+
+                            <p>
+                                <span>时间：</span>
+                                <strong>{{item.courseStartTime}}至{{item.courseStopTime}}</strong>
+                            </p>
+                            <a v-on:click='nowEnter(item.courseId)' class="btn btn-primary tsama-enter" role="button"><span>立即报名 </span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+        </div>
+        <!-- 专家选项 -->
+        <div v-if="expertFlag">
+            <div class="tsama-line"></div>
+            <div class="tsama-main-img-div-top">
+                <div v-for="item in expertsLists">
+                    <div style="height: 17em;width: 80%;margin-left: auto;margin-right: auto;">
+                        <div style="width: 45%;height:100%;float:left; position: relative;">
+                            <div>
+                                <img :src="item.url" class="tsama-expert-img"/>
+                            </div>
+                        </div>
+                        <div style="width: 55%;height:100%;float: right;padding: 1em 1em;color: white">
+                            <div style="background: #761C19;padding: 1em 2em;height: 15em;border-radius: 5px;position: relative"
+                                 class="tsama-expert-list">
+                                <p class="tsama-expert-list-p">
+                                    <a v-on:click='toExpertDetail(item.id)' style="color: #5bc0de;cursor: pointer;"><b>{{item.realname}}</b></a>
+                                </p>
+                                <p class="tsama-expert-list-p" style="margin-top: -5px;">{{item.enname}}</p>
+                                <p class="tsama-expert-list-p" style="margin-top: 20px;">{{item.academic}}</p>
+
+                                <p class="tsama-expert-list-p" style="margin-top: -10px;" v-for="oa in item.otheracademic">{{oa}}</p>
+                                <p class="tsama-expert-list-p"
+                                   style="position: absolute;bottom: 1.1em;text-decoration: underline">
+                                    {{item.openemail}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tsama-line" style="margin-bottom: 1.6em;"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 学员选项 -->
+        <div v-if="studentFlag">
+            <a href="#" style="float: right;    margin-top: -3em;">查看更多>></a>
+            <div class="tsama-line"></div>
+            <div v-for="item in studentList">
+                <div class="tsama-main-img-div-top">
+                    <div class="tsama-main-item-div">
+                        <div id="" style="width: 12em;height: 100%;padding: 0.5em;float: left;">
+                            <img :src="item.url" style="height: 14em;width: 11em;"/>
+                        </div>
+                        <div style="height: 100%;padding: 1em 2em;margin-left: 14em;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;border-left: 1px solid #CCCCCC;">
+                            <p style="font-size: 1.5em;">
+                                <a v-on:click='toStudentDetail(item.id)' style="color: #5bc0de;cursor: pointer;">{{item.realname}}</a>
+                            </p>
+                            <p style="margin-top: -10px;">{{item.enname}}</p>
+                            <p style="font-size: 1.2em;">{{item.position}}</p>
+                            <p style="margin-top: -5px;" v-for="academicItem in item.otherpositions">
+                                {{academicItem}}</p>
+                        </div>
+                        <div style="height: 4em;width:9em;background: #5bc0de;position: absolute;top: 0;right: 5em;border-bottom-left-radius:10px ;border-bottom-right-radius:10px">
+                            <div style="height: 50%;width: 100%;text-align: center;font-size: 1.5em;color: white;padding-top: .2em;">
+                                <span>华商学员</span>
+                            </div>
+                            <div style="height: 50%;width: 100%;text-align: center;font-size: 1.5em;color: white;">
+                                <span>STUDENT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学习选项 -->
+        <div v-if="studyFlag">
+            <a href="#" style="float: right; margin-top: -3em;">查看更多>></a>
+            <div class="tsama-line"></div>
+            <div class="tsama-main-img-div-top">
+                <div v-for="item in studyList">
+                    <div class="tsama-main-item-study-div">
+                        <div style="height: 100%;padding: 1em 2em;float: left;min-width: 350px;">
+                            <p style="font-size: 1.5em;">
+                                <a v-on:click='toCourseDetail(item.courseId)' style="cursor: pointer;">“{{item.courseName}}”</a>
+                            </p>
+                            <p style="margin-left: .5em;"><b>专家：<a v-on:click='toExpertDetail(item.expertId)'
+                                                                   style="cursor: pointer;">{{item.expertName}}</a></b>
+                            </p>
+                            <div>
+                                <p style="margin-left: .5em;"><b>{{item.ban}}：<span>{{item.courseStartTimeStr}}-{{item.courseStopTimeStr}}</span></b>
+                                </p>
+                                <p style="margin-left: .5em;"><b>地点：<span>{{item.courseLocal}}</span></b></p>
+                            </div>
+                        </div>
+                        <img :src="item.imgUrl" style="height: 10.5em;width: 10.5em;float: right;"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 新闻选项 -->
+        <div v-if="newsFlag">
+            <a href="#" style="float: right;    margin-top: -3em;">查看更多>></a>
+            <div class="tsama-line"></div>
+            <div class="row tsama-main-img-div-top">
+                <div class="col-sm-6 col-md-3 " v-for="item in newsList">
+                    <div class="thumbnail tsama-course" style="border-top: .4em solid #5bc0de;border-radius: 0;">
+                        <div class="caption">
+                            <a v-on:click='toNewsDetail(item.id)' style="cursor: pointer;">
+                                <h4 v-bind:title="item.courseName">{{item.title}}</h4>
+                            </a>
+                            <p style="height: 6em;overflow: hidden;text-overflow: ellipsis;">
+                                {{item.content}}
+                            </p>
+                            <p style="margin-bottom: 0;margin-top: 2em;">
+                                <img src="img/tsama-time.png" style="height: 1.4em;margin-top: -4px;"/>
+                                <span>{{item.newsTime}}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container" style="color: #FFFFFF;">
+            <span>页脚</span>
+        </div>
+    </footer>
+</div>
+</body>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            homeFlag: true,
+            expertFlag: false,
+            studentFlag: false,
+            studyFlag: false,
+            newsFlag: false,
+
+            isLoadingFlag: true,
+            nowNavIndex: 0,
+            navTitles: ["火热报名中...", "会当凌绝顶", "海内存知己", "更上一层楼", "朝闻天下"],
+            navTitle: "",
+            homeData: [],
+            expertsLists: [],
+            studentList: [],
+            studyList: [],
+            newsList: [],
+            showLoadingCss: {
+                "in": false,
+                "showloading": false
+            },
+            isPhoneFlag: false,
+            navClickCss: {
+                "background": "rgba(220, 220, 220, 0.4)",
+                "color": "#5bc0de",
+                "border-radius": "5px"
+            },
+            transformFlag: false,
+            isLoginFlag: false,
+            tokenV:""
+
+        },
+        created: function () {
+
+//            if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {
+//                this.isPhoneFlag = true;
+//            } else {
+//                this.isPhoneFlag = false;
+//            }
+            if (token != null) {
+                this.isLoginFlag=true;
+                this.tokenV=token;
+                var str="";
+                if(identityFlag=="0"){
+                    str="/student/getStudentlist";
+                }else
+                    str="/expert/getExpertlist";
+                $.ajax({
+                    url: IP + str,
+                    data: {
+                        id: token.id
+                    },
+                    type: "get",
+                    success: function (data) {
+//                        data=JSON.parse(data);
+                        app.tokenV=data[0];
+                    },
+                    error: function (data, message) {
+                        console.log( data)
+                    }
+                })
+            }
+        },
+        methods: {
+            isShowNowEnlist:function (times) {
+                if((new Date()).getTime()-times>0){
+                    if(((new Date()).getTime()-times)/3600000/24>1){
+                        return false;
+                    }
+                }
+                return true;
+            },
+            logout:function () {
+                logoutC();
+                this.isLoginFlag=false;
+            },
+            toInfo:function () {
+                if(identityFlag!=null){
+                    if(identityFlag=="0")
+                        window.open("html/studentinfo.html");
+                    else
+                        window.open("html/expertinfo.html");
+                }
+            },
+            /**
+             * 立即报名
+             * @param {Object} index
+             */
+            nowEnter: function (index) {
+                if(token!=null){
+                    this.showLoading();
+                    $.ajax({
+                        url: IP + "/enlist/insertEnlist",
+                        data: {
+                            courseid:index,
+                            userid: token.id
+                        },
+                        type: "post",
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            if (data.flag == 1) {
+                                alert("报名成功");
+                            } else if (data.flag == -2) {
+                                alert("您已经报名此课程");
+                            } else{
+                                alert("报名失败");
+                            }
+
+                            app.hideLoading();
+                        },
+                        error: function (data, message) {
+                            console.log(message)
+                        }
+                    })
+                }else{
+                    window.open("html/login.html")
+                }
+            },
+            /**
+             * 跳转到课程详情
+             * @param {Object} index
+             */
+            toCourseDetail: function (index) {
+                window.location.href = 'html/homeDetail.html?id=' + index;
+            },
+            /**
+             * 跳转到专家详情
+             * @param {Object} index
+             */
+            toExpertDetail: function (index) {
+                window.location.href = 'html/expertDetail.html?id=' + index;
+            },
+            /**
+             * 跳转到学员详情
+             * @param {Object} index
+             */
+            toStudentDetail: function (index) {
+                window.location.href = 'html/studentDetail.html?id=' + index;
+            },
+            /**
+             * 跳转到新闻详情
+             * @param {Object} index
+             */
+            toNewsDetail: function (index) {
+                window.location.href = 'html/newsDetail.html?id=' + index;
+            },
+            /**
+             * 点击菜单选项
+             * @param {Object} index 菜单下标
+             */
+            navClick: function (index) {
+                this.nowNavIndex = index;
+                this.navTitle = this.navTitles[index];
+
+                this.getMainData(index);
+            },
+            navClickT: function (index) {
+                window.open(IP + "/index.html?i=" + index + "=", "_self");
+            },
+            /**
+             * 根据索引获取主体数据
+             * @param {Object} index 菜单下标
+             */
+            getMainData: function (index) {
+                console.log(1111)
+                if (index == 0) {
+                    this.homeFlag = true;
+                    this.expertFlag = false;
+                    this.studentFlag = false;
+                    this.studyFlag = false;
+                    this.newsFlag = false;
+                } else if (index == 1) {
+                    this.homeFlag = false;
+                    this.expertFlag = true;
+                    this.studentFlag = false;
+                    this.studyFlag = false;
+                    this.newsFlag = false;
+                } else if (index == 2) {
+                    this.homeFlag = false;
+                    this.expertFlag = false;
+                    this.studentFlag = true;
+                    this.studyFlag = false;
+                    this.newsFlag = false;
+                } else if (index == 3) {
+                    this.homeFlag = false;
+                    this.expertFlag = false;
+                    this.studentFlag = false;
+                    this.studyFlag = true;
+                    this.newsFlag = false;
+                } else if (index == 4) {
+                    this.homeFlag = false;
+                    this.expertFlag = false;
+                    this.studentFlag = false;
+                    this.studyFlag = false;
+                    this.newsFlag = true;
+                }
+                var mainUrl;
+                if (index == 0) {
+                    mainUrl = IP + "/homeData";
+                } else if (index == 1) {
+                    mainUrl = IP + "/expert/getExpertlist";
+                } else if (index == 2) {
+                    mainUrl = IP + "/student/getStudentlist";
+                } else if (index == 3) {
+                    mainUrl = IP + "/homeData";
+                } else if (index == 4) {
+                    mainUrl = IP + "/news/getNewslist";
+                }
+                this.showLoading();
+                $.ajax({
+                    url: mainUrl,
+                    type: "get",
+                    success: function (response) {
+                        if (index == 0) {
+                            app.homeData = response;
+                        } else if (index == 1) {
+                            console.log(response)
+                            app.expertsLists = response;
+                            if(app.expertsLists!=null) {
+                                app.expertsLists.forEach(function (item) {
+                                    if (item.otheracademic != null) {
+                                        item.otheracademic = item.otheracademic.split(",");
+                                    }
+                                })
+
+                            }
+                        } else if (index == 2) {
+                            app.studentList = response;
+                            if(app.studentList!=null) {
+                                app.studentList.forEach(function (item) {
+                                    if (item.otherposition != null) {
+                                        app.studentList.otherpositions = item.otherposition.split(",");
+                                    }
+                                })
+                            }
+                        } else if (index == 3) {
+                            app.studyList = response;
+                        } else if (index == 4) {
+                            app.newsList = response.objectList;
+                        }
+                        console.log(1234)
+                        app.hideLoading();
+                    },
+                    error: function (data, message) {
+                        app.hideLoading();
+                    }
+                })
+
+            },
+            /**
+             * 点击查看更多
+             * @param {Object} index 菜单下标
+             */
+            lookAtMore: function (index) {
+
+            },
+            /**
+             * 隐藏加载中页面
+             */
+            hideLoading: function () {
+                console.log(222)
+                this.showLoadingCss.in = false;
+                this.showLoadingCss.showloading = false;
+                this.isLoadingFlag = true;
+            },
+            /**
+             * 显示加载中页面
+             */
+            showLoading: function () {
+                this.showLoadingCss.in = true;
+                this.showLoadingCss.showloading = true;
+            }
+        }
+    });
+    var nowIndex;
+    if (window.location.href.indexOf("=") != -1) {
+        nowIndex = window.location.href.split("=")[1];
+        if (nowIndex == null || nowIndex.trim() == "") {
+            nowIndex = 0;
+        }
+    } else {
+        nowIndex = 0;
+    }
+    app.navClick(nowIndex);
+</script>
+
+</html>

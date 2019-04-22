@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzx.hsapp.dao.BackgroudinfoMapper">
+  <resultMap id="BaseResultMap" type="com.lzx.hsapp.entity.Backgroudinfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="picture" jdbcType="INTEGER" property="picture" />
+    <result column="createtime" jdbcType="DATE" property="createtime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from backgroudpicture
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lzx.hsapp.entity.Backgroudinfo">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into backgroudpicture (id, picture, createtime
+      )
+    values (#{id,jdbcType=INTEGER}, #{picture,jdbcType=INTEGER}, #{createtime,jdbcType=DATE}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lzx.hsapp.entity.Backgroudinfo">
+    update backgroudpicture
+    set picture = #{picture,jdbcType=INTEGER},
+      createtime = #{createtime,jdbcType=DATE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, picture, createtime
+    from backgroudpicture
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultType="com.lzx.hsapp.entity.Backgroudinfo">
+    select a.id, picture, createtime,url
+    from backgroudpicture a LEFT JOIN sys_file b ON a.picture=b.id
+  </select>
+</mapper>

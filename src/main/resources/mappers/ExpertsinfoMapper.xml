@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzx.hsapp.dao.ExpertsinfoMapper">
+  <resultMap id="BaseResultMap" type="com.lzx.hsapp.entity.Expertsinfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="photoid" jdbcType="INTEGER" property="photoid" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="realname" jdbcType="VARCHAR" property="realname" />
+    <result column="academic" jdbcType="VARCHAR" property="academic" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="isvisible" jdbcType="INTEGER" property="isvisible" />
+    <result column="enname" jdbcType="VARCHAR" property="enname" />
+    <result column="openemail" jdbcType="VARCHAR" property="openemail" />
+    <result column="employer" jdbcType="LONGVARCHAR" property="employer" />
+    <result column="summary" jdbcType="LONGVARCHAR" property="summary" />
+    <result column="otheracademic" jdbcType="LONGVARCHAR" property="otheracademic"/>
+    <result column="motto" jdbcType="LONGVARCHAR" property="motto"/>
+    <result column="summarys" jdbcType="LONGVARCHAR" property="summarys"/>
+    <result column="iscommend" jdbcType="INTEGER" property="iscommend"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from expertsinfo
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lzx.hsapp.entity.Expertsinfo">
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into expertsinfo (id, email, password, 
+      photoid, phone, account, 
+      realname, academic, state, 
+      createtime, isvisible, enname, 
+      openemail, employer, summary,otheracademic,motto,summarys
+      )
+    values (#{id,jdbcType=INTEGER}, #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{photoid,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR}, 
+      #{realname,jdbcType=VARCHAR}, #{academic,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, 
+      #{createtime,jdbcType=TIMESTAMP}, #{isvisible,jdbcType=INTEGER}, #{enname,jdbcType=VARCHAR}, 
+      #{openemail,jdbcType=VARCHAR}, #{employer,jdbcType=LONGVARCHAR}, #{summary,jdbcType=LONGVARCHAR},#{otheracademic,jdbcType=LONGVARCHAR},
+      #{motto,jdbcType=LONGVARCHAR},#{summarys,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lzx.hsapp.entity.Expertsinfo">
+    update expertsinfo
+    <trim prefix="set" suffixOverrides=",">
+      <if test="email!=null">  email= #{email,jdbcType=VARCHAR},</if>
+      <if test="password!=null">password = #{password,jdbcType=VARCHAR},</if>
+      <if test="photoid!=null">  photoid = #{photoid,jdbcType=INTEGER},</if>
+      <if test="phone!=null"> phone = #{phone,jdbcType=VARCHAR},</if>
+      <if test="account!=null"> account = #{account,jdbcType=VARCHAR},</if>
+      <if test="realname!=null"> realname = #{realname,jdbcType=VARCHAR},</if>
+      <if test="academic!=null">academic = #{academic,jdbcType=VARCHAR},</if>
+      <if test="state!=null">state = #{state,jdbcType=INTEGER},</if>
+      <if test="createtime!=null"> createtime = #{createtime,jdbcType=TIMESTAMP},</if>
+      <if test="isvisible!=null">isvisible = #{isvisible,jdbcType=INTEGER},</if>
+      <if test="employer!=null">employer = #{employer,jdbcType=LONGVARCHAR},</if>
+      <if test="summary!=null">summary = #{summary,jdbcType=LONGVARCHAR},</if>
+      <if test="openemail!=null">openemail = #{openemail,jdbcType=VARCHAR},</if>
+      <if test="otheracademic!=null">otheracademic = #{otheracademic,jdbcType=VARCHAR},</if>
+      <if test="enname!=null">enname = #{enname,jdbcType=VARCHAR},</if>
+      <if test="motto!=null">motto = #{motto,jdbcType=VARCHAR},</if>
+      <if test="summarys!=null">summarys = #{summarys,jdbcType=LONGVARCHAR},</if>
+      <if test="iscommend!=null">iscommend = #{iscommend,jdbcType=INTEGER},</if>
+    </trim>
+    where 1=1
+    <if test="id!=null">
+      and  id = #{id,jdbcType=INTEGER}
+    </if>
+    <if test="phone!=null">
+      and phone = #{phone,jdbcType=VARCHAR}
+    </if>
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select id, email, password, photoid, phone, account, realname, academic, state, createtime, 
+    isvisible, enname, openemail, employer, summary,otheracademic,motto
+    from expertsinfo
+    where id = #{id,jdbcType=INTEGER}
+    ORDER BY createtime DESC
+  </select>
+  <select id="selectAll" parameterType="com.lzx.hsapp.entity.ExpertsVoinfo" resultType="com.lzx.hsapp.entity.ExpertsVoinfo">
+    select a.id, a.email, a.photoid, a.phone, a.account, a.realname, a.academic, a.state, a.createtime,
+    a.isvisible, a.enname, a.openemail, a.employer, a.summary,url,a.otheracademic,a.motto,a.summarys,a.iscommend
+    from expertsinfo a LEFT JOIN sys_file b ON a.photoid=b.id where a.state=1
+    <if test="id!=null">
+      and a.id=#{id}
+    </if>
+    <if test="id==null">
+      and a.realname is NOT NULL
+    </if>
+    <if test="email!=null and openemail != ''">
+      and a.email=#{email}
+    </if>
+    <if test="iscommend != null ">
+      AND  iscommend = #{iscommend,jdbcType=INTEGER}
+    </if>
+    ORDER BY a.iscommend ASC, a.createtime DESC
+  </select>
+
+  <select id="selectByAccountEmail" parameterType="com.lzx.hsapp.entity.Expertsinfo" resultMap="BaseResultMap">
+    select  id, email, photoid, phone, account, realname, academic, state, createtime,
+    isvisible, enname, openemail, employer, summary,otheracademic,motto,summarys,iscommend
+    from expertsinfo
+    <where>
+      <if test="phone != null and password!=null ">
+         AND state=1
+      </if>
+
+      <if test="id != null and id != ''">
+        AND  id = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="account != null">
+        AND  account = #{account,jdbcType=VARCHAR}
+      </if>
+      <if test="email != null and email != ''">
+        AND  email = #{email,jdbcType=VARCHAR}
+      </if>
+      <if test="openemail != null and openemail != ''">
+        AND  email = #{email,jdbcType=VARCHAR}
+      </if>
+      <if test="password != null and password != ''">
+        AND  password = #{password,jdbcType=VARCHAR}
+      </if>
+      <if test="phone != null and phone != ''">
+        AND  phone = #{phone,jdbcType=VARCHAR}
+      </if>
+      <if test="iscommend != null">
+        AND  iscommend = #{iscommend,jdbcType=INTEGER}
+      </if>
+      <if test="realname != null">
+        AND  realname = #{realname,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+  <select id="homeExpert" parameterType="com.lzx.hsapp.entity.ExpertsVoinfo" resultType="com.lzx.hsapp.entity.ExpertsVoinfo">
+    select a.id, email, photoid, phone, account, realname, academic, state, createtime,
+    isvisible, enname, openemail, employer, summary,url,otheracademic,motto,summarys,iscommend
+    from expertsinfo a LEFT JOIN sys_file b ON a.photoid=b.id where a.state=1
+    <if test="iscommend!=null ">
+      AND  iscommend = #{iscommend,jdbcType=INTEGER}
+    </if>
+    ORDER BY a.iscommend ASC ,a.createtime DESC
+  </select>
+</mapper>
