@@ -10,4 +10,8 @@ import java.util.List;
 public interface SysDictonaryService {
 
     List<SysDictionary> selectAll(SysDictionary sysDictionary);
+
+    SysDictionary getById(Integer id);
+
+    SysDictionary getByCodeFlag(Integer codeFlag);
 }

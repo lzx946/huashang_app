@@ -4,11 +4,14 @@ import com.lzx.hsapp.entity.Course;
 import com.lzx.hsapp.entity.CourseVo;
 import com.lzx.hsapp.entity.HomeData;
 import com.lzx.hsapp.entity.HomeDataDetail;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
+@Mapper
 @Component
 public interface CourseMapper {
     int deleteByPrimaryKey(Integer id);
@@ -62,4 +65,10 @@ public interface CourseMapper {
      * @return
      */
     List<CourseVo> selectByteach(CourseVo courseVo);
+
+    @Select("select * from course where teacherid = #{teacherId} group by period")
+    List<Course> findByTeacherId(@Param("teacherId") Integer teacherId);
+
+    @Select("select * from course where teacherid = #{teacherId} and name = #{name} and period = #{period}")
+    List<Course> findByTeacherIdAndNameAndPeriod(@Param("teacherId") Integer teacherId,@Param("name") String name,@Param("period") String period);
 }

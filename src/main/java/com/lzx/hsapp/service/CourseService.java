@@ -1,7 +1,10 @@
 package com.lzx.hsapp.service;
 
+import com.lzx.hsapp.dto.GetCourseByTeacherIdInDto;
+import com.lzx.hsapp.dto.GetCourseByTeacherIdOutDto;
 import com.lzx.hsapp.entity.CourseVo;
 import com.lzx.hsapp.utils.Pagination;
+import com.lzx.hsapp.utils.Result;
 
 import java.util.List;
 
@@ -20,4 +23,6 @@ public interface CourseService {
      * @return
      */
     List<CourseVo> selectAll(CourseVo courseVo, Pagination pagination);
+
+    Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto);
 }

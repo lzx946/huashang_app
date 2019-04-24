@@ -24,7 +24,6 @@ public class CourseVo extends Course {
 
     /**
      * 结束时间戳
-
      */
     private Long endtime;
 

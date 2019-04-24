@@ -1,16 +1,25 @@
 package com.lzx.hsapp.service.Impl;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.lzx.hsapp.dto.GetCourseByTeacherIdInDto;
 import com.lzx.hsapp.dao.CourseMapper;
+import com.lzx.hsapp.dto.GetCourseByTeacherIdOutDto;
+import com.lzx.hsapp.dto.TeachPointDto;
+import com.lzx.hsapp.entity.Course;
 import com.lzx.hsapp.entity.CourseVo;
+import com.lzx.hsapp.entity.SysDictionary;
 import com.lzx.hsapp.service.CourseService;
-import com.lzx.hsapp.utils.ActionUtil;
-import com.lzx.hsapp.utils.Pagination;
+import com.lzx.hsapp.service.SysDictonaryService;
+import com.lzx.hsapp.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -19,8 +28,15 @@ import java.util.List;
  */
 @Service
 public class CourseServiceImpl implements CourseService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseServiceImpl.class);
+
     @Autowired
     private CourseMapper courseMapper;
+
+    @Autowired
+    private SysDictonaryService sysDictonaryService;
+
     @Override
     public List<CourseVo> selectByteach(CourseVo courseVo) {
         List<CourseVo> list=courseMapper.selectByteach(courseVo);
@@ -101,5 +117,84 @@ public class CourseServiceImpl implements CourseService {
             return courseVoList;
         }
         return null;
+    }
+
+    @Override
+    public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto){
+
+        if (dto.getTeacherId().equals(null)){
+            return Result.fail(ErrorCode.PARAMETER_CHECK_ERROR);
+        }
+
+        PageUtil page = PageUtil.defaultPage(dto.getPageNum(),dto.getPageSize());
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<Course> courses = courseMapper.findByTeacherId(dto.getTeacherId());
+        if(courses.isEmpty()){
+
+            LOGGER.info("无数据");
+
+            return Result.success("无满足条件的数据",Collections.EMPTY_LIST);
+        }
+        PageInfo<Course> coursePageInfo = new PageInfo<>(courses);
+        List<Course> courseList = coursePageInfo.getList();
+
+        if(courseList.isEmpty()){
+            return Result.success("无满足条件的数据",Collections.EMPTY_LIST);
+        }
+
+        List<GetCourseByTeacherIdOutDto> getCourseByTeacherIdOutDtoList = new ArrayList<>();
+        for (Course course : courseList
+             ) {
+            GetCourseByTeacherIdOutDto getCourseByTeacherIdOutDto = new GetCourseByTeacherIdOutDto();
+            getCourseByTeacherIdOutDto.setId(course.getId());
+            getCourseByTeacherIdOutDto.setName(course.getName());
+            getCourseByTeacherIdOutDto.setPeriod(course.getPeriod());
+            getCourseByTeacherIdOutDto.setSummary(course.getSummary());
+            List<Course> courses1 = courseMapper.findByTeacherIdAndNameAndPeriod(dto.getTeacherId(),course.getName(),course.getPeriod());
+
+            LOGGER.info("course1:{}",courses1);
+
+            List<TeachPointDto> teachPointDtoList = new ArrayList<>();
+            Date totalStartTime = course.getStarttime();
+            Date totalStopTime = course.getStoptime();
+            for (Course newCourse : courses1                                    //一期课有多个教学点
+                 ) {
+                TeachPointDto teachPointDto = new TeachPointDto();
+                teachPointDto.setRoom(newCourse.getRoom());
+                teachPointDto.setStartTime(newCourse.getStarttime());
+                teachPointDto.setStopTime(newCourse.getStoptime());
+                teachPointDto.setState(newCourse.getState());
+                SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(newCourse.getClassroom()));
+                if (sysDictionary != null){                                                                             //查找教学点
+                    teachPointDto.setCodeFlag(sysDictionary.getCodeflag());
+                    teachPointDto.setCodeFlagName(sysDictionary.getCodeflagname());
+                }
+                if (totalStartTime.after(newCourse.getStarttime())){            //最早的开始时间为总的开课时间
+                    totalStartTime = newCourse.getStarttime();
+                }
+                if (totalStopTime.before(newCourse.getStoptime())){         //最晚的结束时间为总的结课时间
+                    totalStopTime = newCourse.getStoptime();
+                }
+
+                teachPointDtoList.add(teachPointDto);
+            }
+
+            getCourseByTeacherIdOutDto.setTeachPointList(teachPointDtoList);
+
+            LOGGER.info("最早的开始时间为总的开课时间:{}",totalStartTime);
+
+            LOGGER.info("最晚的结束时间为总的结课时间:{}",totalStopTime);
+
+            getCourseByTeacherIdOutDto.setTotalStartTime(totalStartTime);
+            getCourseByTeacherIdOutDto.setTotalStopTime(totalStopTime);
+
+            getCourseByTeacherIdOutDtoList.add(getCourseByTeacherIdOutDto);
+
+        }
+
+        LOGGER.info("根据教授ID查询课程：{}",getCourseByTeacherIdOutDtoList);
+
+        return Result.success("success",getCourseByTeacherIdOutDtoList,coursePageInfo.getTotal(),page.getPageNum(),page.getPageSize());
+
     }
 }

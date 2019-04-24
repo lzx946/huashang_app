@@ -5,9 +5,9 @@ import java.util.Date;
 public class Course {
     private Integer id;
 
-    private String name;
+    private String name;        //题目
 
-    private String room;
+    private String room;        //具体上课地点
 
     private String codeflagname;
 
@@ -19,9 +19,9 @@ public class Course {
         this.codeflagname = codeflagname;
     }
 
-    private Integer teacherid;
+    private Integer teacherid;          //教授id
 
-    private Integer state;
+    private Integer state;              //状态0==未审核；1==审核通过；2==审核不通过；3==封禁；4==暂存状态
 
     private Integer type;
 
@@ -29,19 +29,19 @@ public class Course {
 
     private Integer content;
 
-    private Date starttime;
+    private Date starttime;         //开始时间
 
-    private Date stoptime;
+    private Date stoptime;          //结束时间
 
     private String reason;
 
-    private Date createtime;
+    private Date createtime;        //创建时间
 
-    private String period;
+    private String period;              //第几期
 
-    private String classroom;
+    private String classroom;       //教学点code
 
-    private String summary;
+    private String summary;             //摘要
 
     public Integer getId() {
         return id;

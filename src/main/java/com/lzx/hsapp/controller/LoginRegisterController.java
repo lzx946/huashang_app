@@ -66,7 +66,7 @@ public class LoginRegisterController {
         }
     }
 
-    @RequestMapping("/registerStuednt")
+    @RequestMapping("/registerStudent")
     @ResponseBody
     public Boolean register(HttpServletResponse response, Studentsinfo studentsinfo) {
         LOGGER.info("000");
