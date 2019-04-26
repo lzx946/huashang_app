@@ -2,11 +2,15 @@ package com.lzx.hsapp.dao;
 
 import com.lzx.hsapp.entity.ExpertsVoinfo;
 import com.lzx.hsapp.entity.Expertsinfo;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 
+@Mapper
 @Component
 public interface ExpertsinfoMapper {
     int deleteByPrimaryKey(Integer id);
@@ -35,5 +39,8 @@ public interface ExpertsinfoMapper {
      *首页教授推荐
      */
     List<ExpertsVoinfo> homeExpert(ExpertsVoinfo record);
+
+    @Select("select * from expertsinfo where id = #{id}")
+    Expertsinfo findById(@Param("id") Integer id);
 
 }

@@ -2,9 +2,12 @@ package com.lzx.hsapp.service;
 
 import com.lzx.hsapp.dto.GetCourseByTeacherIdInDto;
 import com.lzx.hsapp.dto.GetCourseByTeacherIdOutDto;
+import com.lzx.hsapp.dto.MyCourseListDto;
+import com.lzx.hsapp.dto.MyCourseListOutDto;
 import com.lzx.hsapp.entity.CourseVo;
 import com.lzx.hsapp.utils.Pagination;
 import com.lzx.hsapp.utils.Result;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -25,4 +28,6 @@ public interface CourseService {
     List<CourseVo> selectAll(CourseVo courseVo, Pagination pagination);
 
     Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto);
+
+    Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto);
 }

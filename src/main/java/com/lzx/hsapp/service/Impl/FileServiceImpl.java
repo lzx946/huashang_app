@@ -4,10 +4,13 @@ import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.lzx.hsapp.dao.SysFileMapper;
 import com.lzx.hsapp.entity.SysFile;
 import com.lzx.hsapp.service.FileService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 /**
  * Created by wangdaren on 2018/2/2.
@@ -56,6 +59,20 @@ public class FileServiceImpl implements FileService {
         else
         {
             return null;
+        }
+    }
+
+    @Override
+    public SysFile getByUrl(String url){
+        if (StringUtils.isEmpty(url)){
+            return null;
+        }
+
+        SysFile file = sysFileMapper.findByUrl(url);
+        if (file == null){
+            return null;
+        }else {
+            return file;
         }
     }
 }

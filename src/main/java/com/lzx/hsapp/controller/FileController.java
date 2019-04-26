@@ -32,6 +32,7 @@ public class FileController {
 
     @Autowired
     private FastFileStorageClient fastFileStorageClient;
+
     @Autowired
     public FileService fileService;
 

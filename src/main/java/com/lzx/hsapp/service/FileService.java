@@ -9,4 +9,6 @@ public interface FileService {
     int insert(SysFile record);
     int deleteByPrimaryKey(Integer id);
     SysFile selectByPrimaryKey(Integer id);
+
+    SysFile getByUrl(String url);
 }

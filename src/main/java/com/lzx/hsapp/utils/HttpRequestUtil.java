@@ -1,5 +1,19 @@
 package com.lzx.hsapp.utils;
 
+import com.github.tobato.fastdfs.domain.StorePath;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
+import com.lzx.hsapp.entity.SysFile;
+import com.lzx.hsapp.service.CourseQRCodeService;
+import com.lzx.hsapp.service.FileService;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -12,9 +26,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import javax.net.ssl.TrustManager;
 
+@Component
 public class HttpRequestUtil {
 
-    //private static Logger logger = Logger.getLogger(HttpRequestUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestUtil.class);
 
     public static final String GET_METHOD = "GET";
 
@@ -27,6 +42,15 @@ public class HttpRequestUtil {
     private static int DEFAULT_READTIME = 5000;
     // 获取access_token的路径
     private static String token_path = "https://api.weixin.qq.com/cgi-bin/token";
+
+    @Autowired
+    private FastFileStorageClient fastFileStorageClient;
+
+    @Autowired
+    public FileService fileService;
+
+    @Autowired
+    private CourseQRCodeService courseQRCodeService;
 
     /**
      * http请求
@@ -289,7 +313,60 @@ public class HttpRequestUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        LOGGER.info("下载成功：{}",result.isSuccess());
         return result;
+    }
+
+    /**
+     * 默认的下载素材方法
+     *
+     * @param method  http方法 POST/GET
+     * @param apiPath api路径
+     * @return 是否下载成功 Reuslt.success==true 表示下载成功
+     */
+    public String downloadQRCode(TreeMap<String, String> params, String method, String apiPath,Integer courseId) {
+//        WeiXinResult result = new WeiXinResult();
+        try {
+            apiPath = setParmas(params, apiPath, "");
+            URL url = new URL(apiPath);
+            HttpURLConnection conn = getConnection(method, url);
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                String contentType = conn.getContentType();
+                String name = RandomStringUtils.random(10);
+                MultipartFile multipartFile = new MockMultipartFile(name,conn.getInputStream());
+                StorePath storePath = fastFileStorageClient.uploadFile((InputStream)multipartFile.getInputStream(),multipartFile.getSize(), FilenameUtils.getExtension(multipartFile.getOriginalFilename()),null);
+                SysFile fileinfo=new SysFile();
+                fileinfo.setUrl(storePath.getFullPath());
+                Integer flag= fileService.insert(fileinfo);
+
+                SysFile file = fileService.getByUrl(fileinfo.getUrl());
+
+                LOGGER.info("file:{}",file);
+                if (file != null){
+                    courseQRCodeService.addCourseQRCode(courseId,file.getId());
+                }
+                if(flag!=0){
+                    LOGGER.info("上传文件成功"+storePath.getFullPath());
+                    fileinfo.setCode(1);
+                    fileinfo.setId(fileinfo.getId());
+                    fileinfo.setUrl(ActionUtil.ROOTURL+storePath.getFullPath());
+                }
+                return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "上传图片成功", fileinfo);
+//                result = ContentType(contentType, conn, savePath);
+            } else {
+                return "false";
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        LOGGER.info("下载成功");
+        return "success";
     }
 
     /**

@@ -11,6 +11,8 @@ public class Enlist {
 
     private Integer result;
 
+    private String signIn;              //签到（0==未签到；1==签到）
+
     private Date createtime;
 
     public Integer getId() {
@@ -45,11 +47,31 @@ public class Enlist {
         this.result = result;
     }
 
+    public String getSignIn() {
+        return signIn;
+    }
+
+    public void setSignIn(String signIn) {
+        this.signIn = signIn;
+    }
+
     public Date getCreatetime() {
         return createtime;
     }
 
     public void setCreatetime(Date createtime) {
         this.createtime = createtime;
+    }
+
+    @Override
+    public String toString() {
+        return "Enlist{" +
+                "id=" + id +
+                ", cid=" + cid +
+                ", uid=" + uid +
+                ", result=" + result +
+                ", signIn='" + signIn + '\'' +
+                ", createtime=" + createtime +
+                '}';
     }
 }

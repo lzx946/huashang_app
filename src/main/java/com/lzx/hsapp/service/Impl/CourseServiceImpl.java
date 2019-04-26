@@ -2,20 +2,23 @@ package com.lzx.hsapp.service.Impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.lzx.hsapp.dto.GetCourseByTeacherIdInDto;
+import com.lzx.hsapp.dao.EnlistMapper;
+import com.lzx.hsapp.dao.ExpertsinfoMapper;
+import com.lzx.hsapp.dao.SysFileMapper;
+import com.lzx.hsapp.dto.*;
 import com.lzx.hsapp.dao.CourseMapper;
-import com.lzx.hsapp.dto.GetCourseByTeacherIdOutDto;
-import com.lzx.hsapp.dto.TeachPointDto;
-import com.lzx.hsapp.entity.Course;
-import com.lzx.hsapp.entity.CourseVo;
-import com.lzx.hsapp.entity.SysDictionary;
+import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.service.CourseService;
+import com.lzx.hsapp.service.EnlistService;
 import com.lzx.hsapp.service.SysDictonaryService;
 import com.lzx.hsapp.utils.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,11 +34,23 @@ public class CourseServiceImpl implements CourseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseServiceImpl.class);
 
+    @Value("${preview.url}")
+    private String preview;
+
     @Autowired
     private CourseMapper courseMapper;
 
     @Autowired
     private SysDictonaryService sysDictonaryService;
+
+    @Autowired
+    private EnlistMapper enlistMapper;
+
+    @Autowired
+    private ExpertsinfoMapper expertsinfoMapper;
+
+    @Autowired
+    private SysFileMapper sysFileMapper;
 
     @Override
     public List<CourseVo> selectByteach(CourseVo courseVo) {
@@ -118,7 +133,7 @@ public class CourseServiceImpl implements CourseService {
         }
         return null;
     }
-
+/****************************************************************/
     @Override
     public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto){
 
@@ -197,4 +212,71 @@ public class CourseServiceImpl implements CourseService {
         return Result.success("success",getCourseByTeacherIdOutDtoList,coursePageInfo.getTotal(),page.getPageNum(),page.getPageSize());
 
     }
+
+    @Override
+    public Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto){
+
+        if (dto.getStudentId() == null){
+            return Result.result("NACK","studentId为空" );
+        }
+        List<MyCourseListOutDto> myCourseListOutDtoList = new ArrayList<>();
+
+        PageUtil page = PageUtil.defaultPage(dto.getPageNum(),dto.getPageSize());
+        PageHelper.startPage(page.getPageNum(),page.getPageSize());
+        List<Enlist> enlists = enlistMapper.findByStudentId(dto.getStudentId());
+
+        PageInfo<Enlist> enlistPageInfo = new PageInfo<>(enlists);
+        List<Enlist> enlistList = enlistPageInfo.getList();
+
+        if (!enlistList.isEmpty()){
+            for (Enlist enlist : enlistList
+                 ) {
+                MyCourseListOutDto myCourseListOutDto = new MyCourseListOutDto();
+
+                myCourseListOutDto.setEnlistId(enlist.getId());
+
+                Course course = courseMapper.findById(enlist.getCid());
+
+                if (course != null){
+                    myCourseListOutDto.setCourseId(course.getId());
+                    myCourseListOutDto.setName(course.getName());
+                    myCourseListOutDto.setPeriod(course.getPeriod());
+                    SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course.getClassroom()));
+                    if (sysDictionary != null){
+                        myCourseListOutDto.setCodeFlag(sysDictionary.getCodeflag());
+                        myCourseListOutDto.setCodeFlagName(sysDictionary.getCodeflagname());
+                    }
+                    myCourseListOutDto.setRoom(course.getRoom());
+                    myCourseListOutDto.setStartTime(course.getStarttime());
+                    myCourseListOutDto.setStopTime(course.getStoptime());
+
+                    Expertsinfo teacher = expertsinfoMapper.findById(course.getTeacherid());
+
+                    if (teacher != null){
+                        myCourseListOutDto.setPhotoId(teacher.getPhotoid());
+
+                        SysFile sysFile = sysFileMapper.selectByPrimaryKey(teacher.getPhotoid());
+
+                        if (sysFile != null){
+                            myCourseListOutDto.setPhotoUrl(preview + sysFile.getUrl());
+                        }
+                        myCourseListOutDto.setEmployer(teacher.getEmployer());
+                        myCourseListOutDto.setRealName(teacher.getRealname());
+                        myCourseListOutDto.setAcademic(teacher.getAcademic());
+                    }
+
+                }
+
+                myCourseListOutDtoList.add(myCourseListOutDto);
+            }
+
+            return Result.success("success",myCourseListOutDtoList,enlistPageInfo.getTotal(),page.getPageNum(),page.getPageSize());
+        }
+
+        LOGGER.info("无数据");
+
+        return Result.success("无满足条件的数据",Collections.EMPTY_LIST);
+
+    }
+
 }
