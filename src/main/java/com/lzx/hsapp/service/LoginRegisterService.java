@@ -2,7 +2,9 @@ package com.lzx.hsapp.service;
 
 import com.lzx.hsapp.entity.Expertsinfo;
 import com.lzx.hsapp.entity.Studentsinfo;
+import org.springframework.stereotype.Component;
 
+@Component
 public interface LoginRegisterService {
     /**
      * 根据账户或邮箱登录学员

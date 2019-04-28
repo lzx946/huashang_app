@@ -3,12 +3,15 @@ package com.lzx.hsapp.service;
 import com.lzx.hsapp.entity.Enlist;
 import com.lzx.hsapp.entity.EnlistVoinfo;
 import com.lzx.hsapp.utils.Pagination;
+import com.lzx.hsapp.utils.Result;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by wangdaren on 2018/2/2.
  */
+@Component
 public interface EnlistService {
     /**
      * 根据cid和uid删除一条信息
@@ -29,4 +32,6 @@ public interface EnlistService {
      * @return
      */
     List<EnlistVoinfo> selectAll(EnlistVoinfo enlistVoinfo, Pagination pagination);
+
+    Result<String> signIn(Integer courseId, Integer studentId);
 }

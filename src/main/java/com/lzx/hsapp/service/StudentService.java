@@ -3,12 +3,14 @@ package com.lzx.hsapp.service;
 import com.lzx.hsapp.entity.StudentsVoinfo;
 import com.lzx.hsapp.entity.Studentsinfo;
 import com.lzx.hsapp.utils.Pagination;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by wangdaren on 2018/2/1.
  */
+@Component
 public interface StudentService {
     int deleteByPrimaryKey(Integer id);
 

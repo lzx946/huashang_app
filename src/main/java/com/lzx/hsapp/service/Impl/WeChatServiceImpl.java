@@ -1,21 +1,25 @@
 package com.lzx.hsapp.service.Impl;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.lzx.hsapp.dao.AccessTokenMapper;
 import com.lzx.hsapp.entity.AccessToken;
 import com.lzx.hsapp.entity.WeiXinQRCode;
 import com.lzx.hsapp.service.WeChatService;
+import com.lzx.hsapp.util.HttpRequest;
 import com.lzx.hsapp.utils.HttpRequestUtil;
 import com.lzx.hsapp.utils.WeiXinResult;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -191,6 +195,43 @@ public class WeChatServiceImpl implements WeChatService {
         params.put("ticket", HttpRequestUtil.urlEncode(ticket, HttpRequestUtil.DEFAULT_CHARSET));
         WeiXinResult result = httpRequestUtil.downMeaterMetod(params,HttpRequestUtil.GET_METHOD,showqrcode_path,savePath);       //,savePath
         return result;
+    }
+
+    @Override
+    public String getAccessTokenById(Integer id){
+        AccessToken accessToken = accessTokenMapper.findById(id);
+
+        if (accessToken != null){
+            return accessToken.getAccessToken();
+        }else {
+            return null;
+        }
+    }
+
+    /**
+     * 获取jsapi_ticket 调用微信JS接口的临时票据
+     * @return
+     */
+    @Override
+    public String getTicket(String accessToken) {
+        String jsapiTicket = null;
+        Map<String,String> params = new TreeMap<String,String>();
+        String url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+accessToken+"&type=jsapi";
+        params.put("access_token",accessToken);
+        params.put("type", "jsapi");
+        String result = null;
+        try {
+            result = HttpRequestUtil.defaultConnection("GET",url,5000,5000,null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(StringUtils.isNotBlank(result)){
+            LOGGER.info("result:{}",result);
+            jsapiTicket = (String) JSONObject.fromObject(result).get("ticket");
+            return jsapiTicket;
+        }
+
+        return null;
     }
 
     @Scheduled(cron = "0 0 0/1 * * ?")

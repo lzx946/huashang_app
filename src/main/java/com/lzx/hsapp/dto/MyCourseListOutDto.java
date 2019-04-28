@@ -40,6 +40,8 @@ public class MyCourseListOutDto implements Serializable {
 
     private String employer;            //工作单位
 
+    private String status;              //课程状态（0==未开课；1==已开课；2==已结束；3==已退报）
+
     private PageUtil page;
 
     public Integer getCourseId() {
@@ -154,6 +156,14 @@ public class MyCourseListOutDto implements Serializable {
         this.employer = employer;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public PageUtil getPage() {
         return page;
     }
@@ -179,6 +189,7 @@ public class MyCourseListOutDto implements Serializable {
                 ", photoUrl='" + photoUrl + '\'' +
                 ", academic='" + academic + '\'' +
                 ", employer='" + employer + '\'' +
+                ", status='" + status + '\'' +
                 ", page=" + page +
                 '}';
     }

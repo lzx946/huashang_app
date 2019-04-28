@@ -2,9 +2,11 @@ package com.lzx.hsapp.service;
 
 import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.utils.Pagination;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface HomeDataService {
 
 

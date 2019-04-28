@@ -8,6 +8,8 @@ import java.util.Date;
 public class TeachPointDto implements Serializable {
     private static final long serialVersionUID = -8764222575400744594L;
 
+    private Integer courseId;           //课程ID
+
     private Integer codeFlag;       //教学点code
 
     private String codeFlagName;        //教学点名称
@@ -21,6 +23,14 @@ public class TeachPointDto implements Serializable {
     private Date stopTime;          //结束时间
 
     private Integer state;              //状态0==未审核；1==审核通过；2==审核不通过；3==封禁；4==暂存状态
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
+    }
 
     public Integer getCodeFlag() {
         return codeFlag;
@@ -73,7 +83,8 @@ public class TeachPointDto implements Serializable {
     @Override
     public String toString() {
         return "TeachPointDto{" +
-                "codeFlag=" + codeFlag +
+                "courseId=" + courseId +
+                ", codeFlag=" + codeFlag +
                 ", codeFlagName='" + codeFlagName + '\'' +
                 ", room='" + room + '\'' +
                 ", startTime=" + startTime +

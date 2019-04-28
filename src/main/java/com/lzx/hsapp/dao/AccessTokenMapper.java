@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface AccessTokenMapper {
 
-    @Update("update weixin_access_token set access_token = #{accessToken}, expires_in = #{expiresIn}, create_time = now() where id = #{id}")
+    @Update("update weixin_access_token set access_token = #{accessToken},jsapi_ticket = #{jsapiTicket}, expires_in = #{expiresIn}, create_time = now() where id = #{id}")
     void updateToken(AccessToken accessToken);
 
     @Select("select * from weixin_access_token where id = #{id}")

@@ -5,6 +5,7 @@ import com.lzx.hsapp.entity.CommentDetail;
 import com.lzx.hsapp.service.CommentService;
 import com.lzx.hsapp.utils.ActionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
+@CrossOrigin(value = "*")
 public class CommentController {
     @Autowired
     private CommentService commentService;

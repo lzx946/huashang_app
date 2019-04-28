@@ -1,12 +1,14 @@
 package com.lzx.hsapp.service;
 
 import com.lzx.hsapp.entity.News;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by wangdaren on 2018/2/1.
  */
+@Component
 public interface NewsService {
     int deleteByPrimaryKey(Integer id);
 

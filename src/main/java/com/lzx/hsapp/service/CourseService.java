@@ -1,19 +1,19 @@
 package com.lzx.hsapp.service;
 
-import com.lzx.hsapp.dto.GetCourseByTeacherIdInDto;
-import com.lzx.hsapp.dto.GetCourseByTeacherIdOutDto;
-import com.lzx.hsapp.dto.MyCourseListDto;
-import com.lzx.hsapp.dto.MyCourseListOutDto;
+import com.lzx.hsapp.dto.*;
 import com.lzx.hsapp.entity.CourseVo;
 import com.lzx.hsapp.utils.Pagination;
 import com.lzx.hsapp.utils.Result;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 /**
  * Created by wangdaren on 2018/3/25.
  */
+@Component
 public interface CourseService {
     /**
      * 根据专家id和课程名查询不同地点的课程
@@ -30,4 +30,10 @@ public interface CourseService {
     Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto);
 
     Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto);
+
+    Result<CourseDetailSingleDto> getCourseDetailSingle(CourseIdDto dto);
+
+    Result<CourseTrackingDto> courseTrackingDetail(@RequestBody CourseIdDto dto);
+
+    Result<String> uploadCourseFile(MultipartFile multipartFile, Integer courseId);
 }

@@ -17,7 +17,7 @@ public class CourseFile {
 
     private String courseIds;       //多个课程ID（同一个课程不同教学点）
 
-    private String fileIds;             //多个文件材料ID
+    private Integer fileId;             //文件材料ID
 
     private Date createTime;            //创建时间
 
@@ -39,12 +39,12 @@ public class CourseFile {
         this.courseIds = courseIds;
     }
 
-    public String getFileIds() {
-        return fileIds;
+    public Integer getFileId() {
+        return fileId;
     }
 
-    public void setFileIds(String fileIds) {
-        this.fileIds = fileIds;
+    public void setFileId(Integer fileId) {
+        this.fileId = fileId;
     }
 
     public Date getCreateTime() {
@@ -68,7 +68,7 @@ public class CourseFile {
         return "CourseFile{" +
                 "id=" + id +
                 ", courseIds='" + courseIds + '\'' +
-                ", fileIds='" + fileIds + '\'' +
+                ", fileId=" + fileId +
                 ", createTime=" + createTime +
                 ", modify_time=" + modify_time +
                 '}';

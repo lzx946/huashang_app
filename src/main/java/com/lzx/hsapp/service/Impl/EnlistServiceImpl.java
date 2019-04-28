@@ -6,9 +6,12 @@ import com.lzx.hsapp.entity.Enlist;
 import com.lzx.hsapp.entity.EnlistVoinfo;
 import com.lzx.hsapp.service.EnlistService;
 import com.lzx.hsapp.utils.Pagination;
+import com.lzx.hsapp.utils.Result;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,8 +21,9 @@ import java.util.List;
  * Created by wangdaren on 2018/2/2.
  */
 @Service
+@Component
 public class EnlistServiceImpl implements EnlistService {
-    Logger logger= LoggerFactory.getLogger(getClass().getName());
+    private static final Logger logger= LoggerFactory.getLogger(EnlistServiceImpl.class);
     @Autowired
     private EnlistMapper enlistMapper;
 
@@ -68,5 +72,25 @@ public class EnlistServiceImpl implements EnlistService {
             e.printStackTrace();
         }
             return null;
+    }
+
+    @Override
+    public Result<String> signIn(Integer courseId,Integer studentId){
+        if (courseId != null && studentId != null){
+            Enlist enlist = enlistMapper.findByCourseIdAndStudentId(courseId,studentId);
+            if (enlist != null){
+                if (enlist.getSignIn().equals("1")){
+                    logger.info("已签到");
+                    return Result.result("ACK","已签到");
+                }else {
+                    enlistMapper.updateSingIn("1",enlist.getId());
+
+                    logger.info("签到成功");
+                    return Result.result("ACK","签到成功");
+                }
+            }
+        }
+        logger.info("入参为空");
+        return Result.result("NACK","入参为空");
     }
 }

@@ -17,5 +17,9 @@ public interface WeChatService {
 
     WeiXinResult showQrcode(String ticket, String savePath) throws Exception;
 
+    String getAccessTokenById(Integer id);
+
+    String getTicket(String accessToken);
+
     String getAccessToken();            //String appid, String appsecret
 }

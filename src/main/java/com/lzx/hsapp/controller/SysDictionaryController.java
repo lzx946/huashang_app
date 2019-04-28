@@ -5,6 +5,7 @@ import com.lzx.hsapp.service.SysDictonaryService;
 import com.lzx.hsapp.utils.ActionUtil;
 import com.lzx.hsapp.utils.webUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("sysdictionary")
+@CrossOrigin(value = "*")
 public class SysDictionaryController {
     @Autowired
     private SysDictonaryService sysDictonaryService;

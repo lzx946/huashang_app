@@ -1,6 +1,7 @@
 package com.lzx.hsapp.dao;
 
 import com.lzx.hsapp.entity.SysFile;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 
+@Mapper
 @Component
 public interface SysFileMapper {
     int deleteByPrimaryKey(Integer id);

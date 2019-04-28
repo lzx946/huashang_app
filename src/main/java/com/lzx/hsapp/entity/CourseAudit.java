@@ -21,7 +21,15 @@ public class CourseAudit {
 
     private String firstAudit;              //初步审核（0==未审核；1==通过；2==不通过）
 
+    private Date firstAuditTime;            //初步审核成功时间
+
     private String courseFile;              //课程文件材料审核（0==未审核；1==通过；2==不通过）
+
+    private Date uploadTime;                //上传材料成功时间
+
+    private Date startCourseTime;           //开课时间
+
+    private Date stopCourseTime;            //结课时间
 
     private Date createTime;                //创建时间
 
@@ -59,12 +67,44 @@ public class CourseAudit {
         this.firstAudit = firstAudit;
     }
 
+    public Date getFirstAuditTime() {
+        return firstAuditTime;
+    }
+
+    public void setFirstAuditTime(Date firstAuditTime) {
+        this.firstAuditTime = firstAuditTime;
+    }
+
     public String getCourseFile() {
         return courseFile;
     }
 
     public void setCourseFile(String courseFile) {
         this.courseFile = courseFile;
+    }
+
+    public Date getUploadTime() {
+        return uploadTime;
+    }
+
+    public void setUploadTime(Date uploadTime) {
+        this.uploadTime = uploadTime;
+    }
+
+    public Date getStartCourseTime() {
+        return startCourseTime;
+    }
+
+    public void setStartCourseTime(Date startCourseTime) {
+        this.startCourseTime = startCourseTime;
+    }
+
+    public Date getStopCourseTime() {
+        return stopCourseTime;
+    }
+
+    public void setStopCourseTime(Date stopCourseTime) {
+        this.stopCourseTime = stopCourseTime;
     }
 
     public Date getCreateTime() {
@@ -90,7 +130,11 @@ public class CourseAudit {
                 ", courseIds='" + courseIds + '\'' +
                 ", status='" + status + '\'' +
                 ", firstAudit='" + firstAudit + '\'' +
+                ", firstAuditTime=" + firstAuditTime +
                 ", courseFile='" + courseFile + '\'' +
+                ", uploadTime=" + uploadTime +
+                ", startCourseTime=" + startCourseTime +
+                ", stopCourseTime=" + stopCourseTime +
                 ", createTime=" + createTime +
                 ", modifyTime=" + modifyTime +
                 '}';

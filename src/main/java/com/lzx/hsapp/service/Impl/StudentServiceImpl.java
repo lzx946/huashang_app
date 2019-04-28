@@ -10,6 +10,7 @@ import com.lzx.hsapp.utils.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  * Created by wangdaren on 2018/2/1.
  */
 @Service
+@Component
 public class StudentServiceImpl implements StudentService {
     Logger logger= LoggerFactory.getLogger(getClass().getName());
     @Autowired

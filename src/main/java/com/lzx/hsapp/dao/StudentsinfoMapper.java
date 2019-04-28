@@ -2,11 +2,15 @@ package com.lzx.hsapp.dao;
 
 import com.lzx.hsapp.entity.StudentsVoinfo;
 import com.lzx.hsapp.entity.Studentsinfo;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 
+@Mapper
 @Component
 public interface StudentsinfoMapper {
     int deleteByPrimaryKey(Integer id);
@@ -30,4 +34,7 @@ public interface StudentsinfoMapper {
      * @return
      */
     Studentsinfo selectByAccountEmail(Studentsinfo record);
+
+    @Select("select * from studentsinfo where id = #{id}")
+    Studentsinfo findById(@Param("id") Integer id);
 }

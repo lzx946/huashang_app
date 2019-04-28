@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Mapper
 @Component
 public interface BackgroudinfoMapper {
     int deleteByPrimaryKey(Integer id);

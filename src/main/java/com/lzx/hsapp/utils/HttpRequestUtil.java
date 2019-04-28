@@ -6,12 +6,15 @@ import com.lzx.hsapp.entity.SysFile;
 import com.lzx.hsapp.service.CourseQRCodeService;
 import com.lzx.hsapp.service.FileService;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.net.ssl.*;
@@ -24,6 +27,7 @@ import java.util.Map;
 import java.util.Map.*;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import javax.net.ssl.TrustManager;
 
 @Component
@@ -44,10 +48,10 @@ public class HttpRequestUtil {
     private static String token_path = "https://api.weixin.qq.com/cgi-bin/token";
 
     @Autowired
-    private FastFileStorageClient fastFileStorageClient;
+    private static FastFileStorageClient fastFileStorageClient;
 
     @Autowired
-    public FileService fileService;
+    private static FileService fileService;
 
     @Autowired
     private CourseQRCodeService courseQRCodeService;
@@ -317,6 +321,84 @@ public class HttpRequestUtil {
         LOGGER.info("下载成功：{}",result.isSuccess());
         return result;
     }
+
+
+    public static String downloadQRCode(String urlList) {
+     try {
+         URL url = new URL(urlList);
+        DataInputStream dataInputStream = new DataInputStream(url.openStream());
+        //本地地址及名称
+        String imageName = UUID.randomUUID() + ".jpg";
+        String location = System.getProperty("user.dir");  //+ "/data/tmp"
+        File file = new File(location + "/" + imageName);
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = dataInputStream.read(buffer)) > 0) {
+            output.write(buffer, 0, length);
+        }
+        byte[] context=output.toByteArray();
+        fileOutputStream.write(output.toByteArray());
+        dataInputStream.close();
+        fileOutputStream.close();
+
+        LOGGER.info("file:{}",file);
+
+        File newFile = new File(location + "/" + imageName);        //"D:\\workspace\\微信图片_20190427041340.jpg"
+
+        FileInputStream fileInputStream = new FileInputStream(newFile);
+        MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain", fileInputStream);
+
+        LOGGER.info("multipartFile:{}",multipartFile);
+         try
+         {
+             String filename=multipartFile.getOriginalFilename();
+             LOGGER.info("fileName:{}",filename);
+             String strs= filename.substring(filename.lastIndexOf(".") + 1);
+             if(!StringUtils.hasText(strs)){
+                 return webUtil.result(webUtil.FLAG__FAILED, webUtil.ERROR_CODE_ILLEGAL, "请上传图片", null);
+             }
+
+             LOGGER.info("InputStream:{}",multipartFile.getInputStream());
+             LOGGER.info("size:{}",multipartFile.getSize());
+             LOGGER.info("OriginFilename:{}",multipartFile.getOriginalFilename());
+
+             StorePath storePath = fastFileStorageClient.uploadFile((InputStream)multipartFile.getInputStream(),multipartFile.getSize(), FilenameUtils.getExtension(multipartFile.getOriginalFilename()),null);
+             LOGGER.info("storePath:{}",storePath);
+             SysFile fileinfo=new SysFile();
+             fileinfo.setUrl(storePath.getFullPath());
+             LOGGER.info("file.URL:{}",fileinfo.getUrl());
+             Integer flag= fileService.insert(fileinfo);
+             if(flag!=0){
+                 LOGGER.info("上传文件成功"+storePath.getFullPath());
+                 fileinfo.setCode(1);
+                 fileinfo.setId(fileinfo.getId());
+                 fileinfo.setUrl(ActionUtil.ROOTURL+storePath.getFullPath());
+             }
+             file.delete();
+             newFile.delete();
+
+             return fileinfo.getUrl();
+         }
+         catch (Exception e){
+
+             file.delete();
+             newFile.delete();
+             LOGGER.error("上传文件失败"+e.getMessage());
+             e.printStackTrace();
+         }
+         file.delete();
+         newFile.delete();
+         return webUtil.result(webUtil.FLAG__FAILED, webUtil.ERROR_CODE_ILLEGAL, "上传文件失败", null);
+    } catch (MalformedURLException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+     System.out.println("下载成功");
+     return "success";
+}
 
     /**
      * 默认的下载素材方法

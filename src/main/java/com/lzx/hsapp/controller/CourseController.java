@@ -1,20 +1,14 @@
 package com.lzx.hsapp.controller;
 
-import com.github.pagehelper.PageInfo;
-import com.lzx.hsapp.dto.GetCourseByTeacherIdInDto;
-import com.lzx.hsapp.dto.GetCourseByTeacherIdOutDto;
-import com.lzx.hsapp.dto.MyCourseListDto;
-import com.lzx.hsapp.dto.MyCourseListOutDto;
-import com.lzx.hsapp.entity.CourseVo;
+import com.lzx.hsapp.dto.*;
 import com.lzx.hsapp.service.CourseService;
 import com.lzx.hsapp.utils.ActionUtil;
-import com.lzx.hsapp.utils.Pagination;
 import com.lzx.hsapp.utils.Result;
-import com.lzx.hsapp.utils.webUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("course")
+@CrossOrigin(value = "*")
 public class CourseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
@@ -38,12 +33,44 @@ public class CourseController {
         return courseService.getCoursesByTeacherId(dto);
     }
 
+    @CrossOrigin(origins = "http://localhost:8081")
     @RequestMapping(value = "/getMyCourseList",method = RequestMethod.POST)
     @ResponseBody
-    public Result<List<MyCourseListOutDto>> getMyCourseList(@RequestBody MyCourseListDto dto){
+    public Result<List<MyCourseListOutDto>> getMyCourseList(@RequestBody MyCourseListDto dto,HttpServletResponse response){
+        response.setHeader("Access-Control-Allow-Origin", ActionUtil.CrossDomain);
 
         LOGGER.info("我的课程，根据学生ID查询课程，入参：{}",dto);
 
         return courseService.getMyCourseList(dto);
+    }
+
+    @RequestMapping(value = "/getCourseDetailSingle",method = RequestMethod.POST)
+    @ResponseBody
+    public Result<CourseDetailSingleDto> getCourseDetailSingle(@RequestBody CourseIdDto dto){
+
+        LOGGER.info("单个教学点课程详情，入参：{}",dto);
+
+        return courseService.getCourseDetailSingle(dto);
+
+    }
+
+    @RequestMapping(value = "/courseTrackingDetail",method = RequestMethod.POST)
+    @ResponseBody
+    public Result<CourseTrackingDto> courseTrackingDetail(@RequestBody CourseIdDto dto){
+
+        LOGGER.info("课程跟踪详情，入参：{}",dto);
+
+        return courseService.courseTrackingDetail(dto);
+    }
+
+    @RequestMapping(value = "/uploadCourseFile",method = RequestMethod.POST)
+    @ResponseBody
+    public Result<String> uploadCourseFile(@RequestParam MultipartFile multipartFile, HttpServletRequest request){
+
+        String courseId = request.getParameter("courseId");
+
+        LOGGER.info("上传课程材料文件，入参：{}",courseId);
+
+        return courseService.uploadCourseFile(multipartFile,Integer.valueOf(courseId));
     }
 }

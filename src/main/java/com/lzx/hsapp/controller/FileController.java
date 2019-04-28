@@ -11,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +24,7 @@ import java.io.InputStream;
  */
 @RestController
 @RequestMapping("file")
+@CrossOrigin(value = "*")
 public class FileController {
    Logger logger= LoggerFactory.getLogger(getClass().getName());
 
@@ -34,7 +32,7 @@ public class FileController {
     private FastFileStorageClient fastFileStorageClient;
 
     @Autowired
-    public FileService fileService;
+    private FileService fileService;
 
     /**
      * 上传文件（图片）

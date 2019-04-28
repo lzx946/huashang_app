@@ -17,6 +17,8 @@ public class AccessToken {
 
     private String accessToken;             //获取到的凭证
 
+    private String jsapiTicket;
+
     private Integer expiresIn;             //有效時間，單位：秒
 
     private Date createTime;            //创建时间
@@ -35,6 +37,14 @@ public class AccessToken {
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public String getJsapiTicket() {
+        return jsapiTicket;
+    }
+
+    public void setJsapiTicket(String jsapiTicket) {
+        this.jsapiTicket = jsapiTicket;
     }
 
     public Integer getExpiresIn() {
@@ -58,6 +68,7 @@ public class AccessToken {
         return "AccessToken{" +
                 "id=" + id +
                 ", accessToken='" + accessToken + '\'' +
+                ", jsapiTicket='" + jsapiTicket + '\'' +
                 ", expiresIn=" + expiresIn +
                 ", createTime=" + createTime +
                 '}';

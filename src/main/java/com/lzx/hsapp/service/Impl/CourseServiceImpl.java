@@ -2,24 +2,27 @@ package com.lzx.hsapp.service.Impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.lzx.hsapp.dao.EnlistMapper;
-import com.lzx.hsapp.dao.ExpertsinfoMapper;
-import com.lzx.hsapp.dao.SysFileMapper;
+import com.github.tobato.fastdfs.domain.StorePath;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
+import com.lzx.hsapp.dao.*;
 import com.lzx.hsapp.dto.*;
-import com.lzx.hsapp.dao.CourseMapper;
 import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.service.CourseService;
-import com.lzx.hsapp.service.EnlistService;
 import com.lzx.hsapp.service.SysDictonaryService;
 import com.lzx.hsapp.utils.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,12 +33,16 @@ import java.util.List;
  * Created by wangdaren on 2018/3/25.
  */
 @Service
+@Component
 public class CourseServiceImpl implements CourseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseServiceImpl.class);
 
     @Value("${preview.url}")
     private String preview;
+
+    @Autowired
+    private FastFileStorageClient fastFileStorageClient;
 
     @Autowired
     private CourseMapper courseMapper;
@@ -51,6 +58,18 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private SysFileMapper sysFileMapper;
+
+    @Autowired
+    private CourseAuditMapper courseAuditMapper;
+
+    @Autowired
+    private CourseFileMapper courseFileMapper;
+
+    @Autowired
+    private CommentMapper commentMapper;
+
+    @Autowired
+    private StudentsinfoMapper studentsinfoMapper;
 
     @Override
     public List<CourseVo> selectByteach(CourseVo courseVo) {
@@ -165,6 +184,16 @@ public class CourseServiceImpl implements CourseService {
             getCourseByTeacherIdOutDto.setName(course.getName());
             getCourseByTeacherIdOutDto.setPeriod(course.getPeriod());
             getCourseByTeacherIdOutDto.setSummary(course.getSummary());
+
+            //课程审核状态
+            CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(course.getId()));
+
+            if (courseAudit != null){
+                getCourseByTeacherIdOutDto.setStatus(courseAudit.getStatus());
+            }else {
+                getCourseByTeacherIdOutDto.setStatus("");
+            }
+
             List<Course> courses1 = courseMapper.findByTeacherIdAndNameAndPeriod(dto.getTeacherId(),course.getName(),course.getPeriod());
 
             LOGGER.info("course1:{}",courses1);
@@ -250,6 +279,19 @@ public class CourseServiceImpl implements CourseService {
                     myCourseListOutDto.setStartTime(course.getStarttime());
                     myCourseListOutDto.setStopTime(course.getStoptime());
 
+                    Date date = new Date();
+                    if (date.before(course.getStarttime())){
+                        myCourseListOutDto.setStatus("0");      //0==未开课
+                    }else if (course.getStarttime().before(date) && date.before(course.getStoptime())){
+                        myCourseListOutDto.setStatus("1");          //1==已开课
+                    }else {
+                        myCourseListOutDto.setStatus("2");          //2==已结束
+                    }
+
+                    if(enlist.getResult().equals(1)){
+                        myCourseListOutDto.setStatus("3");      //3==已退报
+                    }
+
                     Expertsinfo teacher = expertsinfoMapper.findById(course.getTeacherid());
 
                     if (teacher != null){
@@ -276,6 +318,241 @@ public class CourseServiceImpl implements CourseService {
         LOGGER.info("无数据");
 
         return Result.success("无满足条件的数据",Collections.EMPTY_LIST);
+
+    }
+
+    @Override
+    public Result<CourseDetailSingleDto> getCourseDetailSingle(CourseIdDto dto){
+        if (dto.getCourseId().equals(null)){
+            return Result.result("NACK","courseId为空");
+        }
+        CourseDetailSingleDto courseDetailSingleDto = new CourseDetailSingleDto();
+        Course course = courseMapper.findById(dto.getCourseId());
+        if (course != null){
+
+            courseDetailSingleDto.setId(course.getId());
+            courseDetailSingleDto.setName(course.getName());
+            courseDetailSingleDto.setCreateTime(course.getCreatetime());
+            courseDetailSingleDto.setPeriod(course.getPeriod());
+            courseDetailSingleDto.setRoom(course.getRoom());
+            courseDetailSingleDto.setStartTime(course.getStarttime());
+            courseDetailSingleDto.setStopTime(course.getStoptime());
+            courseDetailSingleDto.setSummary(course.getSummary());
+            courseDetailSingleDto.setTeacherId(course.getTeacherid());
+
+            SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course.getClassroom()));
+
+            if (sysDictionary != null){
+                courseDetailSingleDto.setCodeFlagName(sysDictionary.getCodeflagname());
+            }
+
+            Expertsinfo teacher = expertsinfoMapper.findById(course.getTeacherid());
+            if (teacher != null){
+                courseDetailSingleDto.setAcademic(teacher.getAcademic());
+                courseDetailSingleDto.setEmployer(teacher.getEmployer());
+                courseDetailSingleDto.setRealName(teacher.getRealname());
+                SysFile sysFile = sysFileMapper.selectByPrimaryKey(teacher.getPhotoid());
+                if (sysFile != null){
+                    courseDetailSingleDto.setUrl(preview + sysFile.getUrl());
+                }
+            }
+            return Result.success("ACK",courseDetailSingleDto);
+        }
+        return Result.result("ACK","无数据");
+    }
+
+    @Override
+    public Result<CourseTrackingDto> courseTrackingDetail(CourseIdDto dto){
+        if (dto.getCourseId() != null){
+            Course course = courseMapper.findById(dto.getCourseId());
+            if (course == null){
+                LOGGER.info("查无此课程");
+                return Result.result("NACK","查无此课程");
+            }
+            CourseTrackingDto courseTrackingDto = new CourseTrackingDto();
+
+            CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(course.getId()));
+
+            if (courseAudit != null){
+                courseTrackingDto.setStatus(courseAudit.getStatus());
+                courseTrackingDto.setApplyTime(courseAudit.getCreateTime());        //申请开课时间
+                courseTrackingDto.setAuditMessage("您好！您申请的"+ course.getName() +"课程有新动态，请前往行程跟踪接受邀请。");
+                courseTrackingDto.setAuditTime(new Date());
+                courseTrackingDto.setAuditor("admin");
+                if (courseAudit.getFirstAuditTime() != null && Integer.valueOf(courseAudit.getStatus()) >= 1){
+                    courseTrackingDto.setAuditSuccessTime(courseAudit.getFirstAuditTime());        //初步审核时间
+                    courseTrackingDto.setAuditMessage("您好！您申请的\""+ course.getName() +"\"课程已经通过初步审核，请尽快上传课程材料、办理签证、机票等相关手续，完成后续工作。");
+                    courseTrackingDto.setAuditTime(courseAudit.getFirstAuditTime());
+                    courseTrackingDto.setAuditor("admin");
+                }
+                if(courseAudit.getUploadTime() != null && Integer.valueOf(courseAudit.getStatus()) >= 2){
+                    courseTrackingDto.setUploadTime(courseAudit.getUploadTime());       //上传材料成功时间
+                }
+                if (courseAudit.getStartCourseTime() != null && Integer.valueOf(courseAudit.getStatus()) >= 3){
+                    courseTrackingDto.setCourseStartTime(courseAudit.getStartCourseTime());         //开课时间
+                }
+                if (courseAudit.getStopCourseTime() != null && Integer.valueOf(courseAudit.getStatus()) >= 4){
+                    courseTrackingDto.setCourseStopTime(courseAudit.getStopCourseTime());           //结课时间
+                }
+            }
+            //显示课程详细信息
+            courseTrackingDto.setCourseId(course.getId());
+            courseTrackingDto.setCourseName(course.getName());
+            courseTrackingDto.setPeriod(course.getPeriod());
+            courseTrackingDto.setSummary(course.getSummary());
+            Expertsinfo teacher = expertsinfoMapper.findById(course.getTeacherid());
+            if (teacher != null){
+                courseTrackingDto.setTeacherId(teacher.getId());
+                courseTrackingDto.setRealName(teacher.getRealname());
+                courseTrackingDto.setAcademic(teacher.getAcademic());
+                courseTrackingDto.setEmployer(teacher.getEmployer());
+                courseTrackingDto.setPhotoId(teacher.getPhotoid());
+                SysFile sysFile = sysFileMapper.selectByPrimaryKey(teacher.getPhotoid());
+
+                if (sysFile != null){
+                    courseTrackingDto.setPhotoUrl(preview + sysFile.getUrl());
+                }
+            }
+
+            //教学点列表
+            List<String> courseIdList = new ArrayList<>();      //课程ID列表
+
+            Date totalBegin = course.getStarttime();
+            Date totalEnd = course.getStoptime();
+
+            List<TeachPointDto> teachPointDtoList = new ArrayList<>();
+            List<Course> courseList = courseMapper.findByName(course.getName());
+            for (Course currentCourse : courseList
+                 ) {
+
+                if (currentCourse.getStarttime().before(totalBegin)){
+                    totalBegin = currentCourse.getStarttime();
+                }
+                if (currentCourse.getStoptime().after(totalEnd)){
+                    totalEnd = currentCourse.getStoptime();
+                }
+
+                courseIdList.add(String.valueOf(currentCourse.getId()));        //把所有教学点的课程ID存入List
+
+                TeachPointDto teachPointDto = new TeachPointDto();
+                teachPointDto.setCourseId(currentCourse.getId());
+                teachPointDto.setState(currentCourse.getState());
+                teachPointDto.setStartTime(currentCourse.getStarttime());
+                teachPointDto.setStopTime(currentCourse.getStoptime());
+                teachPointDto.setRoom(currentCourse.getRoom());
+                SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(currentCourse.getClassroom()));
+                if (sysDictionary != null){
+                    teachPointDto.setCodeFlag(sysDictionary.getCodeflag());
+                    teachPointDto.setCodeFlagName(sysDictionary.getCodeflagname());
+                }
+
+                teachPointDtoList.add(teachPointDto);
+            }
+
+            courseTrackingDto.setTotalBegin(totalBegin);
+            courseTrackingDto.setTotalEnd(totalEnd);
+
+            courseTrackingDto.setTeachPointList(teachPointDtoList);
+
+            //文件材料
+            List<CourseFile> courseFileList = courseFileMapper.findByCourseId(String.valueOf(course.getId()));
+            if (courseFileList.isEmpty()){
+                courseTrackingDto.setFileList(Collections.EMPTY_LIST);
+            }else {
+                List<FileDto> fileDtoList = new ArrayList<>();
+
+                for (CourseFile courseFile : courseFileList
+                     ) {
+                    FileDto fileDto = new FileDto();
+                    SysFile sysFile = sysFileMapper.selectByPrimaryKey(courseFile.getFileId());
+                    if (sysFile != null){
+                        fileDto.setFileId(sysFile.getId());
+                        fileDto.setFileUrl(preview + sysFile.getUrl());
+
+                        fileDtoList.add(fileDto);
+                    }
+                }
+                courseTrackingDto.setFileList(fileDtoList);
+            }
+
+            //评论列表
+            List<Comment> commentList = commentMapper.findByIds(Transform.listToString(courseIdList));
+            List<SimpleCommentDto> commentDtoList = new ArrayList<>();
+            if (commentList == null){
+                commentDtoList = Collections.EMPTY_LIST;
+            }else {
+                for (Comment comment : commentList
+                     ) {
+                    SimpleCommentDto simpleCommentDto = new SimpleCommentDto();
+                    simpleCommentDto.setContent(comment.getContent());
+                    simpleCommentDto.setCommentTime(comment.getCreatetime());
+                    Studentsinfo studentsinfo = studentsinfoMapper.findById(comment.getUid());
+                    if (studentsinfo != null){
+                        simpleCommentDto.setStudentId(studentsinfo.getId());
+                        simpleCommentDto.setRealName(studentsinfo.getRealname());
+                        SysFile sysFile = sysFileMapper.selectByPrimaryKey(studentsinfo.getPhotoid());
+                        if (sysFile != null){
+                            simpleCommentDto.setPhotoUrl(preview + sysFile.getUrl());
+                        }
+                    }
+                    commentDtoList.add(simpleCommentDto);
+                }
+
+            }
+
+            courseTrackingDto.setCommentList(commentDtoList);
+
+            return Result.success("success",courseTrackingDto);
+
+        }
+        LOGGER.info("courseId为空");
+        return Result.result("NACK","courseId为空");
+    }
+
+    @Override
+    public Result<String> uploadCourseFile(MultipartFile multipartFile, Integer courseId){
+        if (courseId == null){
+            return Result.result("NACK","courseId为空");
+        }
+
+//        String filename=multipartFile.getOriginalFilename();
+//        String strs= filename.substring(filename.lastIndexOf(".") + 1);
+
+        StorePath storePath = null;
+        try {
+            storePath = fastFileStorageClient.uploadFile((InputStream)multipartFile.getInputStream(),multipartFile.getSize(), FilenameUtils.getExtension(multipartFile.getOriginalFilename()),null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SysFile fileinfo = new SysFile();
+        fileinfo.setUrl(storePath.getFullPath());
+        sysFileMapper.insert(fileinfo);
+
+        SysFile sysFile = sysFileMapper.findByUrl(fileinfo.getUrl());
+
+        LOGGER.info("上传成功");
+
+        List<String> courseIdList = new ArrayList<>();
+        Course course = courseMapper.findById(courseId);
+        if (course != null){
+
+            List<Course> courseList = courseMapper.findByName(course.getName());
+            for (Course currentCourse : courseList
+            ) {
+                courseIdList.add(String.valueOf(currentCourse.getId()));
+            }
+        }
+
+        CourseFile courseFile = new CourseFile();
+        courseFile.setCourseIds(Transform.listToString(courseIdList));
+        courseFile.setFileId(sysFile.getId());
+        courseFile.setCreateTime(new Date());
+
+        courseFileMapper.insert(courseFile);
+
+        LOGGER.info("添加courseFile：{}",courseFile);
+
+        return Result.result("ACK","上传成功");
 
     }
 

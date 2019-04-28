@@ -4,6 +4,7 @@ import com.lzx.hsapp.dao.SysDictionaryMapper;
 import com.lzx.hsapp.entity.SysDictionary;
 import com.lzx.hsapp.service.SysDictonaryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * Created by wangdaren on 2018/3/26.
  */
 @Service
+@Component
 public class SysDictionaryServiceImpl implements SysDictonaryService {
 
     @Autowired

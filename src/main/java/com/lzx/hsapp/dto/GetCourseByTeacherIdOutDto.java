@@ -15,6 +15,8 @@ public class GetCourseByTeacherIdOutDto implements Serializable {
 
     private String name;        //题目
 
+    private String status;         //课程状态（0==申请课程；1==审核；2==材料上传；3==开课；4==结课）
+
     @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
     private Date totalStartTime;         //开始时间
 
@@ -43,6 +45,14 @@ public class GetCourseByTeacherIdOutDto implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Date getTotalStartTime() {
@@ -98,6 +108,7 @@ public class GetCourseByTeacherIdOutDto implements Serializable {
         return "GetCourseByTeacherIdOutDto{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", status='" + status + '\'' +
                 ", totalStartTime=" + totalStartTime +
                 ", totalStopTime=" + totalStopTime +
                 ", period='" + period + '\'' +
