@@ -23,6 +23,8 @@ public class Trip {
 
     private String boardAndLodging;         //食宿确认（0==未确认；1==需要；2==不需要）
 
+    private Date boardAndLodgingTime;       //食宿确认时间
+
     private String procedure;               //行程手续和材料（0==未审核；1==通过；2==不通过）
 
     private String status;              //行程跟踪状态（0==等待邀请；1==接受邀请；2==食宿确定；3==材料上传）
@@ -71,6 +73,14 @@ public class Trip {
         this.boardAndLodging = boardAndLodging;
     }
 
+    public Date getBoardAndLodgingTime() {
+        return boardAndLodgingTime;
+    }
+
+    public void setBoardAndLodgingTime(Date boardAndLodgingTime) {
+        this.boardAndLodgingTime = boardAndLodgingTime;
+    }
+
     public String getProcedure() {
         return procedure;
     }
@@ -111,6 +121,7 @@ public class Trip {
                 ", teacherId=" + teacherId +
                 ", agree='" + agree + '\'' +
                 ", boardAndLodging='" + boardAndLodging + '\'' +
+                ", boardAndLodgingTime=" + boardAndLodgingTime +
                 ", procedure='" + procedure + '\'' +
                 ", status='" + status + '\'' +
                 ", createTime=" + createTime +

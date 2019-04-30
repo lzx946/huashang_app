@@ -21,7 +21,7 @@ public class CourseFile {
 
     private Date createTime;            //创建时间
 
-    private Date modify_time;           //更新时间
+    private Date modifyTime;           //更新时间
 
     public Integer getId() {
         return id;
@@ -55,12 +55,12 @@ public class CourseFile {
         this.createTime = createTime;
     }
 
-    public Date getModify_time() {
-        return modify_time;
+    public Date getModifyTime() {
+        return modifyTime;
     }
 
-    public void setModify_time(Date modify_time) {
-        this.modify_time = modify_time;
+    public void setModifyTime(Date modifyTime) {
+        this.modifyTime = modifyTime;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CourseFile {
                 ", courseIds='" + courseIds + '\'' +
                 ", fileId=" + fileId +
                 ", createTime=" + createTime +
-                ", modify_time=" + modify_time +
+                ", modifyTime=" + modifyTime +
                 '}';
     }
 }

@@ -17,6 +17,8 @@ public class Invitation {
 
     private Integer courseId;           //课程ID
 
+    private String courseName;          //课程题目
+
     private String city;            //城市
 
     private String place;           //地点
@@ -45,6 +47,14 @@ public class Invitation {
 
     public void setCourseId(Integer courseId) {
         this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
     public String getCity() {
@@ -108,6 +118,7 @@ public class Invitation {
         return "Invitation{" +
                 "id=" + id +
                 ", courseId=" + courseId +
+                ", courseName='" + courseName + '\'' +
                 ", city='" + city + '\'' +
                 ", place='" + place + '\'' +
                 ", startTime=" + startTime +

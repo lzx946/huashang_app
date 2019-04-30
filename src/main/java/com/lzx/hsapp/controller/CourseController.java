@@ -8,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class CourseController {
 
     @RequestMapping(value = "/getCoursesByTeacherId",method = RequestMethod.POST)
     @ResponseBody
-    public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(@RequestBody GetCourseByTeacherIdInDto dto){
+    public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(@RequestBody TeacherIdDto dto){
 
         LOGGER.info("根据教授ID查询课程，入参：{}",dto);
 
@@ -65,12 +63,10 @@ public class CourseController {
 
     @RequestMapping(value = "/uploadCourseFile",method = RequestMethod.POST)
     @ResponseBody
-    public Result<String> uploadCourseFile(@RequestParam MultipartFile multipartFile, HttpServletRequest request){
+    public Result<List<FileDto>> uploadCourseFile(@RequestBody UploadCourseFileDto dto){
 
-        String courseId = request.getParameter("courseId");
+        LOGGER.info("上传课程材料文件，入参：{}",dto);
 
-        LOGGER.info("上传课程材料文件，入参：{}",courseId);
-
-        return courseService.uploadCourseFile(multipartFile,Integer.valueOf(courseId));
+        return courseService.uploadCourseFile(dto);
     }
 }

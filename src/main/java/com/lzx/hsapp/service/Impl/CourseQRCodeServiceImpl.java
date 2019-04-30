@@ -21,14 +21,29 @@ public class CourseQRCodeServiceImpl implements CourseQRCodeService {
     private CourseQRCodeMapper courseQRCodeMapper;
 
     @Override
-    public void addCourseQRCode(Integer courseId,Integer qrCodeID){
-        CourseQRCode courseQRCode = new CourseQRCode();
+    public void addCourseQRCode(Integer courseId, Integer qrCodeId){
 
-        courseQRCode.setCourseId(courseId);
-        courseQRCode.setQrCode(qrCodeID);
-        courseQRCode.setCreateTime(new Date());
-        courseQRCodeMapper.insert(courseQRCode);
+        CourseQRCode qrCode = courseQRCodeMapper.findByCourseId(courseId);
 
-        LOGGER.info("添加CourseQRCode成功：{}",courseQRCode);
+        if (qrCode == null){
+            CourseQRCode courseQRCode = new CourseQRCode();
+
+            courseQRCode.setCourseId(courseId);
+            courseQRCode.setQrCode(qrCodeId);
+            courseQRCode.setCreateTime(new Date());
+            courseQRCodeMapper.insert(courseQRCode);
+
+            LOGGER.info("添加CourseQRCode成功：{}",courseQRCode);
+        }else {
+            qrCode.setQrCode(qrCodeId);
+            qrCode.setModifyTime(new Date());
+
+            courseQRCodeMapper.update(qrCode);
+
+            LOGGER.info("更新CourseQRCode成功:{}",qrCode);
+        }
+
+
+
     }
 }

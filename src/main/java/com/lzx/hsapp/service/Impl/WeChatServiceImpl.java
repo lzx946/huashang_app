@@ -4,11 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.lzx.hsapp.dao.AccessTokenMapper;
+import com.lzx.hsapp.dao.CourseMapper;
 import com.lzx.hsapp.entity.AccessToken;
+import com.lzx.hsapp.entity.Course;
+import com.lzx.hsapp.entity.SysFile;
 import com.lzx.hsapp.entity.WeiXinQRCode;
+import com.lzx.hsapp.service.CourseQRCodeService;
+import com.lzx.hsapp.service.FileService;
 import com.lzx.hsapp.service.WeChatService;
 import com.lzx.hsapp.util.HttpRequest;
 import com.lzx.hsapp.utils.HttpRequestUtil;
+import com.lzx.hsapp.utils.Result;
 import com.lzx.hsapp.utils.WeiXinResult;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
@@ -19,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +56,15 @@ public class WeChatServiceImpl implements WeChatService {
 
     @Autowired
     private HttpRequestUtil httpRequestUtil;
+
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private CourseMapper courseMapper;
+
+    @Autowired
+    private CourseQRCodeService courseQRCodeService;
 
     /**
      * 创建临时带参数二维码
@@ -95,7 +109,7 @@ public class WeChatServiceImpl implements WeChatService {
      * @return
      */
     @Override
-    public String createForeverTicket(int sceneId) {                //String accessToken,
+    public String createForeverTicket(Integer sceneId) {                //String accessToken,
 
         AccessToken token = accessTokenMapper.findById(1);
 
@@ -180,6 +194,10 @@ public class WeChatServiceImpl implements WeChatService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if(params != null || !params.isEmpty()){
+            params.remove("ticket");
+            params.clear();
+        }
         return showqrcode_path;
     }
 
@@ -232,6 +250,59 @@ public class WeChatServiceImpl implements WeChatService {
         }
 
         return null;
+    }
+
+    @Override
+    public Result<String> uploadQRCode(Integer courseId){
+
+        if (courseId == null){
+            LOGGER.info("courseId为空");
+            return Result.result("NACK","courseId为空");
+        }
+
+        Course course = courseMapper.findById(courseId);
+
+        if (course == null){
+            LOGGER.info("无此课程");
+            return Result.result("ACK","无此课程");
+        }
+
+        String ticket = createForeverTicket(courseId);
+
+        LOGGER.info("ticket:{}",ticket);
+
+        if (ticket != null){
+//            String oldUrl = showQrcode(ticket);
+
+            String oldUrl = showqrcode_path + "?ticket=" + ticket;
+
+            LOGGER.info("oldUrl:{}",oldUrl);
+
+            if (oldUrl != null){
+                try {
+                    String url = fileService.download2UploadImg(oldUrl,String.valueOf(courseId));
+
+                    SysFile sysFile = new SysFile();
+
+                    sysFile.setUrl(url);
+
+                    fileService.insert(sysFile);
+
+                    SysFile file = fileService.getByUrl(url);
+
+                    courseQRCodeService.addCourseQRCode(course.getId(),file.getId());
+
+                    return Result.result("ACK","上传成功");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOGGER.info("上传失败：{}",e.getMessage());
+                }
+            }
+
+            return Result.result("NACK","获取二维码失败");
+        }
+        return Result.result("NACK","获取ticket失败");
     }
 
     @Scheduled(cron = "0 0 0/1 * * ?")

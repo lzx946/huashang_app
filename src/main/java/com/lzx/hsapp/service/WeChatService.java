@@ -1,5 +1,6 @@
 package com.lzx.hsapp.service;
 
+import com.lzx.hsapp.utils.Result;
 import com.lzx.hsapp.utils.WeiXinResult;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 public interface WeChatService {
     String createTempTicket(String expireSeconds, int sceneId);
 
-    String createForeverTicket(int sceneId);
+    String createForeverTicket(Integer sceneId);
 
     String createForeverStrTicket(String sceneStr);
 
@@ -20,6 +21,8 @@ public interface WeChatService {
     String getAccessTokenById(Integer id);
 
     String getTicket(String accessToken);
+
+    Result<String> uploadQRCode(Integer courseId);
 
     String getAccessToken();            //String appid, String appsecret
 }

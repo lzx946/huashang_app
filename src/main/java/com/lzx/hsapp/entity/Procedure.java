@@ -17,9 +17,9 @@ public class Procedure {
 
     private Integer tripId;         //行程跟踪表ID
 
-    private String visa;            //签证
+    private Integer visa;            //签证
 
-    private String planeTicket;         //机票
+    private Integer planeTicket;         //机票
 
     private Date createTime;            //创建时间
 
@@ -41,19 +41,19 @@ public class Procedure {
         this.tripId = tripId;
     }
 
-    public String getVisa() {
+    public Integer getVisa() {
         return visa;
     }
 
-    public void setVisa(String visa) {
+    public void setVisa(Integer visa) {
         this.visa = visa;
     }
 
-    public String getPlaneTicket() {
+    public Integer getPlaneTicket() {
         return planeTicket;
     }
 
-    public void setPlaneTicket(String planeTicket) {
+    public void setPlaneTicket(Integer planeTicket) {
         this.planeTicket = planeTicket;
     }
 

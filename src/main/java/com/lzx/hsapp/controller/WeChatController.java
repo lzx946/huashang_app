@@ -221,7 +221,7 @@ public class WeChatController {
         return weChatService.getAccessToken();
     }
 
-    @RequestMapping(value = "/getQRCode",method = RequestMethod.POST)
+    @RequestMapping(value = "/getQRCode",method = RequestMethod.GET)
     @ResponseBody
     public String getQRCode(@Param("courseId") Integer courseId){
 
@@ -236,6 +236,32 @@ public class WeChatController {
             e.printStackTrace();
             return null;
         }
+    }
+
+//    @RequestMapping(value = "/uploadQRCode",method = RequestMethod.GET)
+//    @ResponseBody
+//    public String uploadQRCode(@Param("courseId") Integer courseId){
+//
+//        String ticket = weChatService.createForeverTicket(courseId);
+//
+//        try {
+////            return weChatService.showQrcode(ticket,"/");
+//            String url = weChatService.showQrcode(ticket);
+//            LOGGER.info("url:{}",url);
+//            return HttpRequestUtil.downloadQRCode(url);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+    @RequestMapping(value = "/uploadQRCodeImage",method = RequestMethod.POST)
+    @ResponseBody
+    public Result<String> uploadQRCodeImage(@Param("courseId") Integer courseId){
+
+        LOGGER.info("获取并上传二维码入参,courseId：{}",courseId);
+
+        return weChatService.uploadQRCode(courseId);
     }
 
     @RequestMapping(value = "/getJsapiTicket",method = RequestMethod.POST)

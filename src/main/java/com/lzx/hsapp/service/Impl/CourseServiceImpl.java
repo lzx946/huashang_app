@@ -2,7 +2,6 @@ package com.lzx.hsapp.service.Impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.tobato.fastdfs.domain.StorePath;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.lzx.hsapp.dao.*;
 import com.lzx.hsapp.dto.*;
@@ -10,19 +9,13 @@ import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.service.CourseService;
 import com.lzx.hsapp.service.SysDictonaryService;
 import com.lzx.hsapp.utils.*;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -154,9 +147,10 @@ public class CourseServiceImpl implements CourseService {
     }
 /****************************************************************/
     @Override
-    public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto){
+    public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(TeacherIdDto dto){
 
-        if (dto.getTeacherId().equals(null)){
+        if (dto.getTeacherId() == null){
+            LOGGER.info("teacherId为空");
             return Result.fail(ErrorCode.PARAMETER_CHECK_ERROR);
         }
 
@@ -173,6 +167,7 @@ public class CourseServiceImpl implements CourseService {
         List<Course> courseList = coursePageInfo.getList();
 
         if(courseList.isEmpty()){
+            LOGGER.info("无数据");
             return Result.success("无满足条件的数据",Collections.EMPTY_LIST);
         }
 
@@ -246,6 +241,7 @@ public class CourseServiceImpl implements CourseService {
     public Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto){
 
         if (dto.getStudentId() == null){
+            LOGGER.info("studentId为空");
             return Result.result("NACK","studentId为空" );
         }
         List<MyCourseListOutDto> myCourseListOutDtoList = new ArrayList<>();
@@ -312,6 +308,7 @@ public class CourseServiceImpl implements CourseService {
                 myCourseListOutDtoList.add(myCourseListOutDto);
             }
 
+            LOGGER.info("查询我的课程列表成功：{}",myCourseListOutDtoList);
             return Result.success("success",myCourseListOutDtoList,enlistPageInfo.getTotal(),page.getPageNum(),page.getPageSize());
         }
 
@@ -324,6 +321,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Result<CourseDetailSingleDto> getCourseDetailSingle(CourseIdDto dto){
         if (dto.getCourseId().equals(null)){
+            LOGGER.info("courseId为空");
             return Result.result("NACK","courseId为空");
         }
         CourseDetailSingleDto courseDetailSingleDto = new CourseDetailSingleDto();
@@ -356,8 +354,10 @@ public class CourseServiceImpl implements CourseService {
                     courseDetailSingleDto.setUrl(preview + sysFile.getUrl());
                 }
             }
+            LOGGER.info("查询我的课程详情成功：{}",courseDetailSingleDto);
             return Result.success("ACK",courseDetailSingleDto);
         }
+        LOGGER.info("无数据");
         return Result.result("ACK","无数据");
     }
 
@@ -461,12 +461,14 @@ public class CourseServiceImpl implements CourseService {
             }else {
                 List<FileDto> fileDtoList = new ArrayList<>();
 
+                int i = 1;
                 for (CourseFile courseFile : courseFileList
                      ) {
                     FileDto fileDto = new FileDto();
                     SysFile sysFile = sysFileMapper.selectByPrimaryKey(courseFile.getFileId());
                     if (sysFile != null){
                         fileDto.setFileId(sysFile.getId());
+                        fileDto.setFileName("课程文件 《 " + i + " 》");
                         fileDto.setFileUrl(preview + sysFile.getUrl());
 
                         fileDtoList.add(fileDto);
@@ -502,6 +504,8 @@ public class CourseServiceImpl implements CourseService {
 
             courseTrackingDto.setCommentList(commentDtoList);
 
+            LOGGER.info("课程跟踪详情，结果：{}",courseTrackingDto);
+
             return Result.success("success",courseTrackingDto);
 
         }
@@ -510,30 +514,18 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Result<String> uploadCourseFile(MultipartFile multipartFile, Integer courseId){
-        if (courseId == null){
+    public Result<List<FileDto>> uploadCourseFile(UploadCourseFileDto dto){
+        if (dto.getCourseId() == null){
+            LOGGER.info("courseId为空");
             return Result.result("NACK","courseId为空");
         }
 
-//        String filename=multipartFile.getOriginalFilename();
-//        String strs= filename.substring(filename.lastIndexOf(".") + 1);
-
-        StorePath storePath = null;
-        try {
-            storePath = fastFileStorageClient.uploadFile((InputStream)multipartFile.getInputStream(),multipartFile.getSize(), FilenameUtils.getExtension(multipartFile.getOriginalFilename()),null);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (dto.getFileIdList().isEmpty()){
+            LOGGER.info("fileIdList为空");
+            return Result.result("ACK","fileIdList为空");
         }
-        SysFile fileinfo = new SysFile();
-        fileinfo.setUrl(storePath.getFullPath());
-        sysFileMapper.insert(fileinfo);
-
-        SysFile sysFile = sysFileMapper.findByUrl(fileinfo.getUrl());
-
-        LOGGER.info("上传成功");
-
         List<String> courseIdList = new ArrayList<>();
-        Course course = courseMapper.findById(courseId);
+        Course course = courseMapper.findById(dto.getCourseId());
         if (course != null){
 
             List<Course> courseList = courseMapper.findByName(course.getName());
@@ -541,18 +533,45 @@ public class CourseServiceImpl implements CourseService {
             ) {
                 courseIdList.add(String.valueOf(currentCourse.getId()));
             }
+        }else {
+            LOGGER.info("无此课程");
+            return Result.result("ACK","无此课程");
         }
 
-        CourseFile courseFile = new CourseFile();
-        courseFile.setCourseIds(Transform.listToString(courseIdList));
-        courseFile.setFileId(sysFile.getId());
-        courseFile.setCreateTime(new Date());
+        for (Integer fileId : dto.getFileIdList()
+             ) {
+            CourseFile courseFile = new CourseFile();
+            courseFile.setCourseIds(Transform.listToString(courseIdList));
+            courseFile.setFileId(fileId);
+            courseFile.setCreateTime(new Date());
 
-        courseFileMapper.insert(courseFile);
+            courseFileMapper.insert(courseFile);
 
-        LOGGER.info("添加courseFile：{}",courseFile);
+            LOGGER.info("添加courseFile：{}",courseFile);
+        }
+        List<CourseFile> courseFileList = courseFileMapper.findByCourseId(String.valueOf(course.getId()));
+        if (courseFileList != null){
+            List<FileDto> fileDtoList = new ArrayList<>();
+            int i = 1;
+            for (CourseFile courseFile : courseFileList
+                 ) {
+                SysFile sysFile = sysFileMapper.selectByPrimaryKey(courseFile.getFileId());
+                if (sysFile != null){
+                    FileDto fileDto = new FileDto();
 
-        return Result.result("ACK","上传成功");
+                    fileDto.setFileId(sysFile.getId());
+                    fileDto.setFileName("课程文件 《 " + i + " 》");
+                    fileDto.setFileUrl(preview + sysFile.getUrl());
+
+                    fileDtoList.add(fileDto);
+                }
+            }
+            LOGGER.info("上传成功：{}",fileDtoList);
+            return Result.result("ACK","上传成功",fileDtoList);
+        }
+
+        LOGGER.info("上传成功");
+        return Result.result("ACK","上传成功",Collections.EMPTY_LIST);
 
     }
 

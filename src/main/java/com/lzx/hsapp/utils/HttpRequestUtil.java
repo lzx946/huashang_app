@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -322,7 +323,7 @@ public class HttpRequestUtil {
         return result;
     }
 
-
+//    @Scheduled(cron = "0 0/1 * * * ?")
     public static String downloadQRCode(String urlList) {
      try {
          URL url = new URL(urlList);
@@ -345,20 +346,20 @@ public class HttpRequestUtil {
 
         LOGGER.info("file:{}",file);
 
-        File newFile = new File(location + "/" + imageName);        //"D:\\workspace\\微信图片_20190427041340.jpg"
+//        File newFile = new File(location + "/" + imageName);        //"D:\\workspace\\微信图片_20190427041340.jpg"
 
-        FileInputStream fileInputStream = new FileInputStream(newFile);
+        FileInputStream fileInputStream = new FileInputStream(file);
         MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain", fileInputStream);
 
         LOGGER.info("multipartFile:{}",multipartFile);
          try
          {
-             String filename=multipartFile.getOriginalFilename();
-             LOGGER.info("fileName:{}",filename);
-             String strs= filename.substring(filename.lastIndexOf(".") + 1);
-             if(!StringUtils.hasText(strs)){
-                 return webUtil.result(webUtil.FLAG__FAILED, webUtil.ERROR_CODE_ILLEGAL, "请上传图片", null);
-             }
+//             String filename=multipartFile.getOriginalFilename();
+//             LOGGER.info("fileName:{}",filename);
+//             String strs= filename.substring(filename.lastIndexOf(".") + 1);
+//             if(!StringUtils.hasText(strs)){
+//                 return webUtil.result(webUtil.FLAG__FAILED, webUtil.ERROR_CODE_ILLEGAL, "请上传图片", null);
+//             }
 
              LOGGER.info("InputStream:{}",multipartFile.getInputStream());
              LOGGER.info("size:{}",multipartFile.getSize());
@@ -377,19 +378,19 @@ public class HttpRequestUtil {
                  fileinfo.setUrl(ActionUtil.ROOTURL+storePath.getFullPath());
              }
              file.delete();
-             newFile.delete();
+//             newFile.delete();
 
-             return fileinfo.getUrl();
+             return storePath.getFullPath();
          }
          catch (Exception e){
 
              file.delete();
-             newFile.delete();
-             LOGGER.error("上传文件失败"+e.getMessage());
+//             newFile.delete();
+             LOGGER.error("上传文件失败:"+e.getMessage());
              e.printStackTrace();
          }
          file.delete();
-         newFile.delete();
+//         newFile.delete();
          return webUtil.result(webUtil.FLAG__FAILED, webUtil.ERROR_CODE_ILLEGAL, "上传文件失败", null);
     } catch (MalformedURLException e) {
         e.printStackTrace();

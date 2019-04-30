@@ -6,7 +6,6 @@ import com.lzx.hsapp.utils.Pagination;
 import com.lzx.hsapp.utils.Result;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public interface CourseService {
      */
     List<CourseVo> selectAll(CourseVo courseVo, Pagination pagination);
 
-    Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(GetCourseByTeacherIdInDto dto);
+    Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(TeacherIdDto dto);
 
     Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto);
 
@@ -35,5 +34,5 @@ public interface CourseService {
 
     Result<CourseTrackingDto> courseTrackingDetail(@RequestBody CourseIdDto dto);
 
-    Result<String> uploadCourseFile(MultipartFile multipartFile, Integer courseId);
+    Result<List<FileDto>> uploadCourseFile(UploadCourseFileDto dto);
 }

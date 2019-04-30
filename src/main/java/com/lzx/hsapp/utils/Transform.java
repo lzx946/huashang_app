@@ -35,6 +35,32 @@ public class Transform {
     }
 
     /**
+     * List转String
+     * @param list
+     * @return
+     */
+    public static String listIntegerToString(List<Integer> list){
+
+        if(list==null){
+            return null;
+        }
+
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        //第一个前面不拼接","
+        for(Integer integer :list) {
+            if(first) {
+                first=false;
+            }else{
+                result.append(",");
+            }
+            result.append(integer);
+        }
+        return result.toString();
+    }
+
+    /**
      * String转List
      * @param strs
      * @return

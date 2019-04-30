@@ -2,7 +2,7 @@ package com.lzx.hsapp.dto;
 
 import java.io.Serializable;
 
-public class GetCourseByTeacherIdInDto implements Serializable {
+public class TeacherIdDto implements Serializable {
 
     private static final long serialVersionUID = 5571602988639108442L;
 
@@ -38,7 +38,7 @@ public class GetCourseByTeacherIdInDto implements Serializable {
 
     @Override
     public String toString() {
-        return "GetCourseByTeacherIdInDto{" +
+        return "TeacherIdDto{" +
                 "teacherId=" + teacherId +
                 ", pageNum=" + pageNum +
                 ", pageSize=" + pageSize +

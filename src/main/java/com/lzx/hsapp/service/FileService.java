@@ -13,4 +13,6 @@ public interface FileService {
     SysFile selectByPrimaryKey(Integer id);
 
     SysFile getByUrl(String url);
+
+    String download2UploadImg(String oldUrl, String courseId) throws Exception;
 }

@@ -9,7 +9,7 @@ public class TripProgressDto implements Serializable {
 
     private static final long serialVersionUID = 3843841361631411743L;
 
-    private String status;          //行程状态（0==等待邀请；1==接受邀请；2==食宿确定；3==材料上传）
+    private String status;          //行程状态（0==等待邀请；1==接受邀请；2==食宿确定；3==材料上传）确定之后不能再更改
 
     @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
     private Date waitInvitationTime;        //等待邀请时间

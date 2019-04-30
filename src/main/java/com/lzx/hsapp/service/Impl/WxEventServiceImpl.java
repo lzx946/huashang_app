@@ -32,7 +32,7 @@ import java.util.Map;
 @Component
 public class WxEventServiceImpl implements WxEventService {
 
-    private static final Logger log = LoggerFactory.getLogger(WxEventServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxEventServiceImpl.class);
 
     @Value("${preview.url}")
     private String preview;
@@ -104,6 +104,10 @@ public class WxEventServiceImpl implements WxEventService {
                         }
                     } else if (eventType.equals(EventConstant.EVENT_TYPE_SCAN)) { // 扫码事件
                         Course course = courseMapper.findById(Integer.valueOf(eventKey));
+
+                        LOGGER.info("eventKey:{}",eventKey);
+                        LOGGER.info("course:{}",course);
+                        LOGGER.info("courseID:{}",course.getId());
 
                         if (course != null){
                             NewsResponseMessage newsMessage = new NewsResponseMessage();
