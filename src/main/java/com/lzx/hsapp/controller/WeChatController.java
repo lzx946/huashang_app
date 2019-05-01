@@ -49,7 +49,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/wechat")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class WeChatController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WeChatController.class);
@@ -296,23 +296,27 @@ public class WeChatController {
             double lat = Double.valueOf(latitude).doubleValue();
             double lon = Double.valueOf(longitude).doubleValue();
 
-//            // 微信是GPS需要转化地图
-//            Gps gps = new Gps(lat, lon);
-//            Gps gcj = PositionUtil.gps84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
-//            String jsonStr = GetLocationMsg.GetLocationMs(gcj.getWgLat(), gcj.getWgLon());
-//
-//            // 因为嵌套太多先解析
-//            JSONObject jsonObj = JSONArray.parseObject(jsonStr);
-//            JSONArray jsonArray = (JSONArray) jsonObj.get("results");
-//            List list = new ArrayList();// 用list保存全部数据
-//            for (int i = 0; i < jsonArray.size(); i++) {
-//                UserDetails user = (UserDetails) JSONObject.toJavaObject(jsonArray.getJSONObject(i), UserDetails.class);
-//                // System.out.println(user.toString());
-//                list.add(user.getFormatted_address());
-//            }
-//            String json = JSON.toJSONString(list); // list转json
-//            System.out.println(json);
-//            // 页面上
+            // 微信是GPS需要转化地图
+            Gps gps = new Gps(lat, lon);
+            LOGGER.info("gps:{}",gps);
+            Gps gcj = PositionUtil.gps84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
+            LOGGER.info("gcj:{}",gcj);
+            String jsonStr = GetLocationMsg.GetLocationMs(gcj.getWgLat(), gcj.getWgLon());
+            LOGGER.info("jsonStr:{}",jsonStr);
+
+            // 因为嵌套太多先解析
+            JSONObject jsonObj = JSONArray.parseObject(jsonStr);
+            JSONArray jsonArray = (JSONArray) jsonObj.get("results");
+            List list = new ArrayList();// 用list保存全部数据
+            for (int i = 0; i < jsonArray.size(); i++) {
+                UserDetails user = (UserDetails) JSONObject.toJavaObject(jsonArray.getJSONObject(i), UserDetails.class);
+                // System.out.println(user.toString());
+                list.add(user.getFormatted_address());
+            }
+            String json = JSON.toJSONString(list); // list转json
+            LOGGER.info("json:{}",json);
+            System.out.println(json);
+            // 页面上
 //            return json;
             return enlistService.signIn(courseId,studentId);
         }else {

@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("student")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class StudentController {
     Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired

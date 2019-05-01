@@ -19,7 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("sysdictionary")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class SysDictionaryController {
     @Autowired
     private SysDictonaryService sysDictonaryService;

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class LoginRegisterController {
 
     private Logger LOGGER = LoggerFactory.getLogger(LoginRegisterController.class.getName());

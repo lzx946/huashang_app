@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/trip")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class TripController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TripController.class);

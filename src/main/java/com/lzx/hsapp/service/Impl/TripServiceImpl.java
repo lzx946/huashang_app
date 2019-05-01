@@ -257,18 +257,34 @@ public class TripServiceImpl implements TripService {
                         }
                         invitationDto.setInviteList(tripDetailDtoList);
                         invitationDto.setAgree(invitation.getAgree());
+                        if (invitation.getAgree().equals("0")){
+                            invitationDto.setMessage("等待确认邀请中.....");
+
+                            tripTrackingDto.setInvitationAgree("0");
+                            tripTrackingDto.setInvitationMessage("等待确认邀请中.....");
+                        }
                         if (invitation.getAgree().equals("1")){
 
                             tripProgressDto.setAcceptInvitationTime(invitation.getModifyTime());        //接受邀请时间
 
                             invitationDto.setMessage("学院已确认您的操作！");
-                        }if (invitation.getAgree().equals(2)){
-                            invitationDto.setMessage("您的更改请求未通过，请重新选择上课时间，谢谢！");
+
+                            tripTrackingDto.setInvitationAgree("1");
+                            tripTrackingDto.setInvitationMessage("您已接受邀请，学院已确认您的操作！");
+                        }
+                        if (invitation.getAgree().equals("2")){
+
+                            invitationDto.setMessage("请求更改，请稍等！");
                         }
                         invitationDtoList.add(invitationDto);
                     }
                     tripTrackingDto.setInvitationList(invitationDtoList);
 
+                }
+
+                if (courseAudit.getFirstAudit().equals("2")){
+                    tripTrackingDto.setInvitationAgree("2");
+                    tripTrackingDto.setInvitationMessage("您的更改未通过，请重新选择！");
                 }
 
 
@@ -277,11 +293,18 @@ public class TripServiceImpl implements TripService {
             //食宿确定
             if (Integer.valueOf(trip.getStatus()) >= 1 && Integer.valueOf(courseAudit.getStatus()) >= 1){       //通过初审，接受邀请
 
-                if (!trip.getBoardAndLodging().equals("0") && trip.getBoardAndLodgingTime() != null){
+                if (!trip.getBoardAndLodging().equals("2") && trip.getBoardAndLodgingTime() != null){
                     tripProgressDto.setBoardAndLodgingTime(trip.getBoardAndLodgingTime());      //食宿确认时间
                 }
 
-                if (trip.getBoardAndLodging().equals("1")){     //需要学院安排食宿
+                if (trip.getBoardAndLodging().equals("0")){
+                    tripTrackingDto.setNeedBoardAndLodging("0");        //未确认
+                    tripTrackingDto.setBoardAndLodgingMessage("等待食宿确认中......");
+                }else if (trip.getBoardAndLodging().equals("1")){     //需要学院安排食宿
+
+                    tripTrackingDto.setNeedBoardAndLodging("1");        //未确认
+                    tripTrackingDto.setBoardAndLodgingMessage("本次行程需要安排食宿");
+
                     List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
 
                     List<BoardAndLodging> boardAndLodgingList = boardAndLodgingMapper.findByTripId(trip.getId());
@@ -301,6 +324,9 @@ public class TripServiceImpl implements TripService {
                         }
                         tripTrackingDto.setBoardAndLodgingList(tripDetailDtoList);
                     }
+                }else {
+                    tripTrackingDto.setNeedBoardAndLodging("2");        //未确认
+                    tripTrackingDto.setBoardAndLodgingMessage("本次行程不需要安排食宿！");
                 }
 
 
@@ -443,6 +469,8 @@ public class TripServiceImpl implements TripService {
                 if (courseAudit != null){
                     courseAudit.setCourseIds(Transform.listIntegerToString(courseIdList));
                     courseAudit.setStatus("0");     //状态回到最开始
+                    courseAudit.setFirstAudit("0");
+                    courseAudit.setFirstAuditTime(null);
                     courseAudit.setModifyTime(new Date());
 
                     courseAuditMapper.update(courseAudit);

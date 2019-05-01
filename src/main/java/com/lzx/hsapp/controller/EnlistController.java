@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("enlist")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class EnlistController {
     Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired

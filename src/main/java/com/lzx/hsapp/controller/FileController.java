@@ -24,7 +24,7 @@ import java.io.InputStream;
  */
 @RestController
 @RequestMapping("file")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class FileController {
    Logger logger= LoggerFactory.getLogger(getClass().getName());
 

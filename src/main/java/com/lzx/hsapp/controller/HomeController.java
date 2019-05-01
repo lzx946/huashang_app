@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class HomeController {
     Logger logger= LoggerFactory.getLogger(getClass().getName());
     @Autowired

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class CommentController {
     @Autowired
     private CommentService commentService;

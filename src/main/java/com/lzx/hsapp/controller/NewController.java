@@ -22,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("news")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class NewController {
     Logger log = LoggerFactory.getLogger(getClass());
 

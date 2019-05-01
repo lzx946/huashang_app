@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("expert")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "*")
 public class ExpertController {
     Logger logger= LoggerFactory.getLogger(getClass().getName());
     @Autowired

@@ -121,13 +121,6 @@ public class FileServiceImpl implements FileService {
             }
             //2.上传图片
             storePath = fastFileStorageClient.uploadFile(is,tempFile.length(), FilenameUtils.getExtension(fileName),null);
-            if (is != null){
-                is.close();
-            }
-
-            if (tempFile != null){
-                tempFile.delete();
-            }
 //            newPic = FastDfsUtil.uploadFile(is, fileName);
         } finally {
             //手动删除临时文件
@@ -141,18 +134,6 @@ public class FileServiceImpl implements FileService {
             if (tempFile != null) {
                 tempFile.delete();
             }
-        }
-
-        //手动删除临时文件
-        if (is != null) {
-            try {
-                is.close();
-            } catch (IOException e) {
-                throw new IOException("文件流关闭失败");
-            }
-        }
-        if (tempFile != null) {
-            tempFile.delete();
         }
         logger.info("上传完之后新图片地址="+(preview + storePath.getFullPath()));
         return storePath.getFullPath();
