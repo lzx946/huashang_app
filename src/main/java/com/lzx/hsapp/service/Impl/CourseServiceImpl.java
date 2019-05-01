@@ -9,6 +9,7 @@ import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.service.CourseService;
 import com.lzx.hsapp.service.SysDictonaryService;
 import com.lzx.hsapp.utils.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +147,32 @@ public class CourseServiceImpl implements CourseService {
         return null;
     }
 /****************************************************************/
+
+
+    @Override
+    public boolean createCourseAuditByCourseName(String courseName){
+        if (StringUtils.isEmpty(courseName)){
+            return false;
+        }
+
+        List<Integer> courseIdList = courseMapper.findIdsByName(courseName);
+
+        if (!courseIdList.isEmpty()){
+
+            CourseAudit courseAudit = new CourseAudit();
+            courseAudit.setCourseIds(Transform.listIntegerToString(courseIdList));
+            courseAudit.setFirstAudit("0");
+            courseAudit.setStatus("0");
+            courseAudit.setCourseFile("0");
+            courseAudit.setCreateTime(new Date());
+
+            courseAuditMapper.insert(courseAudit);
+
+            LOGGER.info("新建课程考核表");
+        }
+        return true;
+    }
+
     @Override
     public Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(TeacherIdDto dto){
 

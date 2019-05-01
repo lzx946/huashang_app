@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.service.CourseService;
 import com.lzx.hsapp.service.HomeDataService;
+import com.lzx.hsapp.service.TripService;
 import com.lzx.hsapp.utils.ActionUtil;
 import com.lzx.hsapp.utils.DateUtils;
 import com.lzx.hsapp.utils.Pagination;
@@ -27,11 +28,18 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "*")
 public class HomeController {
+
     Logger logger= LoggerFactory.getLogger(getClass().getName());
+
     @Autowired
     HomeDataService homeDataService ;
+
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private TripService tripService;
+
     /**
      * 获取首页Poster数据
      * @param response
@@ -111,7 +119,10 @@ public class HomeController {
        }
        try{
            boolean flag= homeDataService.insertBatch(courses);
-           if(flag==true){
+           boolean createCourseAudit = courseService.createCourseAuditByCourseName(name);
+           boolean createTrip = tripService.createTripByCourseName(name);
+           if(flag==true && createCourseAudit==true && createTrip==true){
+
                return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "课程提交成功", flag);
            }
        }

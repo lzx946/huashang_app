@@ -11,16 +11,16 @@ public class TripProgressDto implements Serializable {
 
     private String status;          //行程状态（0==等待邀请；1==接受邀请；2==食宿确定；3==材料上传）确定之后不能再更改
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date waitInvitationTime;        //等待邀请时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date acceptInvitationTime;          //接受邀请时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date boardAndLodgingTime;           //食宿确定时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date uploadTime;                //上传材料成功时间
 
     public String getStatus() {

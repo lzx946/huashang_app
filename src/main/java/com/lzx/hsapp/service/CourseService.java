@@ -26,6 +26,9 @@ public interface CourseService {
      */
     List<CourseVo> selectAll(CourseVo courseVo, Pagination pagination);
 
+
+    boolean createCourseAuditByCourseName(String courseName);
+
     Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(TeacherIdDto dto);
 
     Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto);

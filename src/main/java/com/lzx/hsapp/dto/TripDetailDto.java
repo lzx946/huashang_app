@@ -1,5 +1,7 @@
 package com.lzx.hsapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,8 +15,10 @@ public class TripDetailDto implements Serializable {
 
     private String place;           //地点
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;         //开始时间
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date stopTime;          //结束时间
 
     public Integer getId() {

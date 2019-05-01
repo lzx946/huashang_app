@@ -15,19 +15,19 @@ public class CourseTrackingDto implements Serializable {
 
     private String status;         //课程状态（0==申请课程；1==审核；2==材料上传；3==开课；4==结课）
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date applyTime;             //申请课程时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date auditSuccessTime;             //审核成功时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date uploadTime;            //材料上传时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date courseStartTime;               //开课时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date courseStopTime;            //结课时间
 
     //课程详细信息
@@ -44,10 +44,10 @@ public class CourseTrackingDto implements Serializable {
 
     private String academic;            //职称
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date totalBegin;            //总开课时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date totalEnd;              //总结课时间
 
     private List<TeachPointDto> teachPointList;         //教学点列表
@@ -65,7 +65,7 @@ public class CourseTrackingDto implements Serializable {
 
     private String auditor;              //审核人
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date auditTime;             //审核时间
 
     //材料上传

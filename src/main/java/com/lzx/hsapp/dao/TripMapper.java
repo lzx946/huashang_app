@@ -10,7 +10,7 @@ import java.util.List;
 @Component
 public interface TripMapper {
 
-    @Insert("insert into trip (id,course_ids,teacher_id,agree,board_and_lodging，board_and_lodging_time,`procedure`,status,create_time,modify_time) " +
+    @Insert("insert into trip (id,course_ids,teacher_id,agree,board_and_lodging,board_and_lodging_time,`procedure`,status,create_time,modify_time) " +
             "values (#{id},#{courseIds},#{teacherId},#{agree},#{boardAndLodging},#{boardAndLodgingTime},#{procedure},#{status},#{createTime},#{modifyTime})")
     void insert(Trip trip);
 

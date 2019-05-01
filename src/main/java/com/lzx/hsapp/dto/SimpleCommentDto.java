@@ -17,7 +17,7 @@ public class SimpleCommentDto implements Serializable {
 
     private String content;         //评论内容
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date commentTime;       //评论时间
 
     public Integer getStudentId() {

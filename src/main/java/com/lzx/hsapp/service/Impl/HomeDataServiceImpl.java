@@ -108,6 +108,7 @@ public class HomeDataServiceImpl implements HomeDataService {
         try{
             int flag=courseMapper.insertBatch(record);
             if(flag!=0){
+                log.info("批量插入课程信息成功");
                 return true;
             }
         }catch (Exception  e){

@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public interface CourseAuditMapper {
 
+    @Insert("insert into course_audit (id,course_ids,status,first_audit,first_audit_time,course_file,upload_time,start_course_time,stop_course_time,create_time,modify_time) " +
+            "values (#{id},#{courseIds},#{status},#{firstAudit},#{firstAuditTime},#{courseFile},#{uploadTime},#{startCourseTime},#{stopCourseTime},#{createTime},#{modifyTime})")
+    void insert(CourseAudit courseAudit);
+
     @Select("select * from course_audit where course_ids like concat('%',#{courseId},'%')")
     CourseAudit findByCourseId(@Param("courseId") String courseId);
 

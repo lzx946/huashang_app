@@ -60,6 +60,40 @@ public class TripServiceImpl implements TripService {
     private ExpertsinfoMapper expertsinfoMapper;
 
     @Override
+    public boolean createTripByCourseName(String courseName){
+
+        if (StringUtils.isEmpty(courseName)){
+            return false;
+        }
+
+        List<Integer> courseIdList = courseMapper.findIdsByName(courseName);
+
+        if (!courseIdList.isEmpty()){
+
+            Course course = courseMapper.findById(courseIdList.get(0));
+
+            if (course != null){
+                Trip trip = new Trip();
+
+                trip.setCourseIds(Transform.listIntegerToString(courseIdList));
+                trip.setTeacherId(course.getTeacherid());
+                trip.setStatus("0");
+                trip.setBoardAndLodging("0");
+                trip.setAgree("0");
+                trip.setProcedure("0");
+                trip.setCreateTime(new Date());
+
+                tripMapper.insert(trip);
+
+                LOGGER.info("新建行程表：{}",trip);
+            }
+        }
+
+        return true;
+
+    }
+
+    @Override
     public Result<List<TripCardDto>> getTripTrackingList(TeacherIdDto dto){
         if (dto.getTeacherId() == null){
             LOGGER.info("teacherId为空");
@@ -293,7 +327,7 @@ public class TripServiceImpl implements TripService {
             //食宿确定
             if (Integer.valueOf(trip.getStatus()) >= 1 && Integer.valueOf(courseAudit.getStatus()) >= 1){       //通过初审，接受邀请
 
-                if (!trip.getBoardAndLodging().equals("2") && trip.getBoardAndLodgingTime() != null){
+                if (!trip.getBoardAndLodging().equals("0") && trip.getBoardAndLodgingTime() != null){
                     tripProgressDto.setBoardAndLodgingTime(trip.getBoardAndLodgingTime());      //食宿确认时间
                 }
 

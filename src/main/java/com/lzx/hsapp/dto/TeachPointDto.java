@@ -16,10 +16,10 @@ public class TeachPointDto implements Serializable {
 
     private String room;                //具体开课地点
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;         //开始时间
 
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date stopTime;          //结束时间
 
     private Integer state;              //状态0==未审核；1==审核通过；2==审核不通过；3==封禁；4==暂存状态
