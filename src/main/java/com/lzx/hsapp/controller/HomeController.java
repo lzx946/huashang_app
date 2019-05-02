@@ -101,6 +101,8 @@ public class HomeController {
         String info=request.getParameter("timeLocals");
         List<Course> courses=new ArrayList<Course>();
         JSONArray jsonArray = JSONArray.fromObject(info);
+        String maxPeriod = courseService.getMaxPeriodByName(name);
+        Integer period = Integer.valueOf(maxPeriod) + 1;
         for(int i=0;i<jsonArray.size();i++){
             Course course=new Course();
             course.setName(name);
@@ -115,12 +117,13 @@ public class HomeController {
             course.setStoptime(DateUtils.getFormatDate(stoptime,DateUtils.yyyyMMdd));
             course.setCreatetime(new Date());
             course.setState(0);//待审核
+            course.setPeriod(String.valueOf(period));
             courses.add(course);
        }
        try{
            boolean flag= homeDataService.insertBatch(courses);
-           boolean createCourseAudit = courseService.createCourseAuditByCourseName(name);
-           boolean createTrip = tripService.createTripByCourseName(name);
+           boolean createCourseAudit = courseService.createCourseAuditByCourseName(name,String.valueOf(period));
+           boolean createTrip = tripService.createTripByCourseName(name,String.valueOf(period));
            if(flag==true && createCourseAudit==true && createTrip==true){
 
                return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "课程提交成功", flag);

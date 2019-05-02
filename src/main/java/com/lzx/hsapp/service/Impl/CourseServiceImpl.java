@@ -150,12 +150,12 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public boolean createCourseAuditByCourseName(String courseName){
+    public boolean createCourseAuditByCourseName(String courseName,String period){
         if (StringUtils.isEmpty(courseName)){
             return false;
         }
 
-        List<Integer> courseIdList = courseMapper.findIdsByName(courseName);
+        List<Integer> courseIdList = courseMapper.findIdsByNameAndPeriod(courseName,period);
 
         if (!courseIdList.isEmpty()){
 
@@ -171,6 +171,11 @@ public class CourseServiceImpl implements CourseService {
             LOGGER.info("新建课程考核表");
         }
         return true;
+    }
+
+    @Override
+    public String getMaxPeriodByName(String name){
+        return courseMapper.findMaxPeriodByName(name);
     }
 
     @Override
@@ -448,7 +453,7 @@ public class CourseServiceImpl implements CourseService {
             Date totalEnd = course.getStoptime();
 
             List<TeachPointDto> teachPointDtoList = new ArrayList<>();
-            List<Course> courseList = courseMapper.findByName(course.getName());
+            List<Course> courseList = courseMapper.findByNameAndPeriod(course.getName(),course.getPeriod());
             for (Course currentCourse : courseList
                  ) {
 
@@ -499,6 +504,7 @@ public class CourseServiceImpl implements CourseService {
                         fileDto.setFileUrl(preview + sysFile.getUrl());
 
                         fileDtoList.add(fileDto);
+                        i++;
                     }
                 }
                 courseTrackingDto.setFileList(fileDtoList);
@@ -555,7 +561,7 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseMapper.findById(dto.getCourseId());
         if (course != null){
 
-            List<Course> courseList = courseMapper.findByName(course.getName());
+            List<Course> courseList = courseMapper.findByNameAndPeriod(course.getName(),course.getPeriod());
             for (Course currentCourse : courseList
             ) {
                 courseIdList.add(String.valueOf(currentCourse.getId()));

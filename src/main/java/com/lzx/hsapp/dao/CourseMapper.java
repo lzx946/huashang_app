@@ -73,11 +73,11 @@ public interface CourseMapper {
     @Select("select * from course where id = #{id}  and state <> 2")
     Course findById(@Param("id") Integer id);
 
-    @Select("select * from course where name = #{name}  and state <> 2")
-    List<Course> findByName(@Param("name") String name);
+    @Select("select * from course where name = #{name} and period = #{period} and state <> 2")
+    List<Course> findByNameAndPeriod(@Param("name") String name,@Param("period") String period);
 
-    @Select("select id from course where name = #{name}  and state <> 2")
-    List<Integer> findIdsByName(@Param("name") String name);
+    @Select("select id from course where name = #{name} and period = #{period} and state <> 2")
+    List<Integer> findIdsByNameAndPeriod(@Param("name") String name,@Param("period") String period);
 
     @Select("select * from course where id in (${ids}) and state <> 2 group by period ")
     Course findByIds(@Param("ids") String ids);
@@ -94,4 +94,7 @@ public interface CourseMapper {
 
     @Select("select * from course where id in (${ids}) and state <> 2")
     List<Course> findInIds(@Param("ids") String ids);
+
+    @Select("select max(period) from course where name = #{name} and state <> 2")
+    String findMaxPeriodByName(@Param("name") String name);
 }

@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 @Component
 public interface TripService {
-    boolean createTripByCourseName(String courseName);
+    boolean createTripByCourseName(String courseName,String period);
 
     Result<List<TripCardDto>> getTripTrackingList(TeacherIdDto dto);
 

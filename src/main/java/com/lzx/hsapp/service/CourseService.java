@@ -27,7 +27,9 @@ public interface CourseService {
     List<CourseVo> selectAll(CourseVo courseVo, Pagination pagination);
 
 
-    boolean createCourseAuditByCourseName(String courseName);
+    boolean createCourseAuditByCourseName(String courseName,String period);
+
+    String getMaxPeriodByName(String name);
 
     Result<List<GetCourseByTeacherIdOutDto>> getCoursesByTeacherId(TeacherIdDto dto);
 

@@ -60,13 +60,13 @@ public class TripServiceImpl implements TripService {
     private ExpertsinfoMapper expertsinfoMapper;
 
     @Override
-    public boolean createTripByCourseName(String courseName){
+    public boolean createTripByCourseName(String courseName,String period){
 
         if (StringUtils.isEmpty(courseName)){
             return false;
         }
 
-        List<Integer> courseIdList = courseMapper.findIdsByName(courseName);
+        List<Integer> courseIdList = courseMapper.findIdsByNameAndPeriod(courseName,period);
 
         if (!courseIdList.isEmpty()){
 
@@ -225,7 +225,7 @@ public class TripServiceImpl implements TripService {
         Date totalEnd = course.getStoptime();
 
         List<TeachPointDto> teachPointDtoList = new ArrayList<>();
-        List<Course> courseList = courseMapper.findByName(course.getName());
+        List<Course> courseList = courseMapper.findByNameAndPeriod(course.getName(),course.getPeriod());
         for (Course currentCourse : courseList
         ) {
 
@@ -453,6 +453,38 @@ public class TripServiceImpl implements TripService {
             tripMapper.update(trip);
 
             LOGGER.info("接受邀请，Trip.agree = 1");
+
+            //将总开课时间、总结课时间记录到课程考核表中
+            List<Course> courseList = courseMapper.findInIds(trip.getCourseIds());
+            if (!courseList.isEmpty()){
+                Date totalBegin = null;
+                Date totalEnd = null;
+                for (Course course : courseList
+                     ) {
+                    if (totalBegin == null){
+                        totalBegin = course.getStarttime();
+                    }
+                    if (totalEnd == null){
+                        totalEnd = course.getStoptime();
+                    }
+                    if (totalBegin.after(course.getStarttime())){
+                        totalBegin = course.getStarttime();
+                    }
+                    if (totalEnd.before(course.getStoptime())){
+                        totalEnd = course.getStoptime();
+                    }
+                }
+                CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(courseList.get(0).getId()));
+                if (courseAudit != null){
+                    courseAudit.setStartCourseTime(totalBegin);
+                    courseAudit.setStopCourseTime(totalEnd);
+                    courseAudit.setModifyTime(new Date());
+
+                    courseAuditMapper.update(courseAudit);
+
+                    LOGGER.info("更新课程考核表，设置课程总开课时间，总结课时间");
+                }
+            }
         }else if (dto.getAgree().equals("2")){          //更改
 
             if (dto.getClassList().isEmpty()){
@@ -484,7 +516,7 @@ public class TripServiceImpl implements TripService {
                     LOGGER.info("新建课程：{}",newCourse);
                 }
 
-                List<Integer> courseIdList = courseMapper.findIdsByName(course.getName());
+                List<Integer> courseIdList = courseMapper.findIdsByNameAndPeriod(course.getName(),course.getPeriod());
 
                 //更改时间，修改trip
                 if (!courseIdList.isEmpty()){
@@ -538,7 +570,7 @@ public class TripServiceImpl implements TripService {
                 LOGGER.info("删除课程审核表");
 
                 //删除邀请表
-                List<Integer> courseIdList = courseMapper.findIdsByName(course.getName());
+                List<Integer> courseIdList = courseMapper.findIdsByNameAndPeriod(course.getName(),course.getPeriod());
                 if (!courseIdList.isEmpty()){
                     for (Integer courseId : courseIdList
                          ) {
