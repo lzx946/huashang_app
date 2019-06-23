@@ -7,6 +7,7 @@ import com.lzx.hsapp.entity.HomeDataDetail;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -64,7 +65,7 @@ public interface CourseMapper {
      */
     List<CourseVo> selectByteach(CourseVo courseVo);
 
-    @Select("select * from course where teacherid = #{teacherId} and state <> 2 group by period")
+    @Select("select * from course where teacherid = #{teacherId} and state <> 2 group by name, period order by createtime desc")
     List<Course> findByTeacherId(@Param("teacherId") Integer teacherId);
 
     @Select("select * from course where teacherid = #{teacherId} and name = #{name} and period = #{period} and state <> 2")
@@ -97,4 +98,7 @@ public interface CourseMapper {
 
     @Select("select max(period) from course where name = #{name} and state <> 2")
     String findMaxPeriodByName(@Param("name") String name);
+
+    @Update("update course set starttime = #{startTime}, stoptime = #{stopTime} where id = #{id}")
+    void updateTimeById(@Param("id") Integer id, @Param("startTime") Date startTime,@Param("stopTime") Date stopTime);
 }

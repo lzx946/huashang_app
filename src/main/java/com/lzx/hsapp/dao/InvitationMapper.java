@@ -29,4 +29,7 @@ public interface InvitationMapper {
 
     @Delete("delete from invitation where course_id = #{courseId}")
     void delete(@Param("courseId") Integer courseId);
+
+    @Select("select * from invitation where course_id = #{courseId} and agree = #{agree}")
+    List<Invitation> findByCourseIdAndAgree(@Param("courseId") Integer courseId,@Param("agree") String agree);
 }

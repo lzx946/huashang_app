@@ -258,63 +258,146 @@ public class TripServiceImpl implements TripService {
 
         tripTrackingDto.setCourseDetail(courseDetailDto);
 
-        CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(course.getId()));
+        CourseAudit courseAudit = courseAuditMapper.findByCourseId("'" + String.valueOf(course.getId()) + "'");
 
+        LOGGER.info("考核：{}",courseAudit);
         if (courseAudit != null){
-            if (Integer.valueOf(trip.getStatus()) >= 0 && Integer.valueOf(courseAudit.getStatus()) >= 1){       //申请课程，通过初审
-
+            if (Integer.valueOf(trip.getStatus()) >= 0 && Integer.valueOf(courseAudit.getStatus()) >= 0){       //更改
                 //邀请表
 
-                List<Invitation> invitationList = invitationMapper.findByCourseId(course.getId());      //多个时间点
+                List<Invitation> invitationList = invitationMapper.findByCourseIdsAndAgree(trip.getCourseIds(),"2");
+                LOGGER.info("invitationList:{}",invitationList);
                 if (!invitationList.isEmpty()){
                     List<InvitationDto> invitationDtoList = new ArrayList<>();
+                    InvitationDto invitationDto = new InvitationDto();
+                    List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
                     for (Invitation invitation : invitationList
-                         ) {
-                        InvitationDto invitationDto = new InvitationDto();
-                        List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
-                        List<Invitation> invitationList1 = invitationMapper.findByCourseNameAndCreateTime(course.getName(),invitation.getCreateTime());     //单个时间点，多个教学点
-                        for (Invitation currentInvitation : invitationList1
-                             ) {
-                            TripDetailDto tripDetailDto = new TripDetailDto();
-                            tripDetailDto.setId(currentInvitation.getId());     //邀请表ID
-                            Course course1 = courseMapper.findById(invitation.getCourseId());
-                            if (course1 != null){
-                                tripDetailDto.setPlace(course.getRoom());       //具体地点
-                                tripDetailDto.setStartTime(course.getStarttime());      //开课时间
-                                tripDetailDto.setStopTime(course.getStoptime());        //结课时间
-                                SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course1.getClassroom()));
-                                if (sysDictionary != null){
-                                    tripDetailDto.setCity(sysDictionary.getCodeflagname());     //具体上课地点
-                                }
-                            }
-                            tripDetailDtoList.add(tripDetailDto);
-                        }
-                        invitationDto.setInviteList(tripDetailDtoList);
-                        invitationDto.setAgree(invitation.getAgree());
-                        if (invitation.getAgree().equals("0")){
-                            invitationDto.setMessage("等待确认邀请中.....");
+                    ) {
+                        TripDetailDto tripDetailDto = new TripDetailDto();
+                        tripDetailDto.setId(invitation.getId());        //邀请表ID
+                        tripDetailDto.setCity(invitation.getCity());
+                        tripDetailDto.setPlace(invitation.getPlace());
+                        tripDetailDto.setStartTime(invitation.getStartTime());
+                        tripDetailDto.setStopTime(invitation.getStopTime());
 
-                            tripTrackingDto.setInvitationAgree("0");
-                            tripTrackingDto.setInvitationMessage("等待确认邀请中.....");
-                        }
-                        if (invitation.getAgree().equals("1")){
+                        tripDetailDtoList.add(tripDetailDto);
 
-                            tripProgressDto.setAcceptInvitationTime(invitation.getModifyTime());        //接受邀请时间
 
-                            invitationDto.setMessage("学院已确认您的操作！");
-
-                            tripTrackingDto.setInvitationAgree("1");
-                            tripTrackingDto.setInvitationMessage("您已接受邀请，学院已确认您的操作！");
-                        }
-                        if (invitation.getAgree().equals("2")){
-
-                            invitationDto.setMessage("请求更改，请稍等！");
-                        }
-                        invitationDtoList.add(invitationDto);
                     }
-                    tripTrackingDto.setInvitationList(invitationDtoList);
+                    invitationDto.setInviteList(tripDetailDtoList);
 
+                    invitationDtoList.add(invitationDto);
+                    tripTrackingDto.setInvitationList(invitationDtoList);
+                    tripTrackingDto.setInvitationAgree("2");
+                    tripTrackingDto.setInvitationMessage("您的更改已提交审核，请耐心等待。");
                 }
+            }
+            if (Integer.valueOf(trip.getStatus()) >= 0 && Integer.valueOf(courseAudit.getStatus()) >= 1){       //申请课程，通过初审
+
+
+                List<Invitation> invitationList1 = invitationMapper.findByCourseIdsAndAgree(trip.getCourseIds(),"0");      //审核通过
+                if (!invitationList1.isEmpty()){
+                    List<InvitationDto> invitationDtoList = new ArrayList<>();
+                    InvitationDto invitationDto = new InvitationDto();
+                    List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
+                    for (Invitation invitation : invitationList1
+                    ) {
+                        TripDetailDto tripDetailDto = new TripDetailDto();
+                        tripDetailDto.setId(invitation.getId());        //邀请表ID
+                        tripDetailDto.setCity(invitation.getCity());
+                        tripDetailDto.setPlace(invitation.getPlace());
+                        tripDetailDto.setStartTime(invitation.getStartTime());
+                        tripDetailDto.setStopTime(invitation.getStopTime());
+
+                        tripDetailDtoList.add(tripDetailDto);
+
+
+                    }
+                    invitationDto.setInviteList(tripDetailDtoList);
+
+                    invitationDtoList.add(invitationDto);
+                    tripTrackingDto.setInvitationList(invitationDtoList);
+                    tripTrackingDto.setInvitationAgree("0");
+                    tripTrackingDto.setInvitationMessage("等待确认邀请中.....");
+                }
+
+                List<Invitation> invitationList2 = invitationMapper.findByCourseIdsAndAgree(trip.getCourseIds(),"1");      //审核通过
+                if (!invitationList2.isEmpty()){
+                    List<InvitationDto> invitationDtoList = new ArrayList<>();
+                    InvitationDto invitationDto = new InvitationDto();
+                    List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
+                    for (Invitation invitation : invitationList2
+                    ) {
+                        TripDetailDto tripDetailDto = new TripDetailDto();
+                        tripDetailDto.setId(invitation.getId());        //邀请表ID
+                        tripDetailDto.setCity(invitation.getCity());
+                        tripDetailDto.setPlace(invitation.getPlace());
+                        tripDetailDto.setStartTime(invitation.getStartTime());
+                        tripDetailDto.setStopTime(invitation.getStopTime());
+
+                        tripDetailDtoList.add(tripDetailDto);
+
+
+                    }
+                    invitationDto.setInviteList(tripDetailDtoList);
+
+                    invitationDtoList.add(invitationDto);
+                    tripTrackingDto.setInvitationList(invitationDtoList);
+                    tripTrackingDto.setInvitationAgree("1");
+                    tripTrackingDto.setInvitationMessage("您已接受邀请，学院已确认您的操作！");
+                }
+//                if (!invitationList.isEmpty()){
+//                    List<InvitationDto> invitationDtoList = new ArrayList<>();
+//                    for (Invitation invitation : invitationList
+//                         ) {
+//                        InvitationDto invitationDto = new InvitationDto();
+//                        List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
+//                        List<Invitation> invitationList1 = invitationMapper.findByCourseNameAndCreateTime(course.getName(),invitation.getCreateTime());     //单个时间点，多个教学点
+//                        for (Invitation currentInvitation : invitationList1
+//                             ) {
+//                            TripDetailDto tripDetailDto = new TripDetailDto();
+//                            tripDetailDto.setId(currentInvitation.getId());     //邀请表ID
+//                            tripDetailDto.setStartTime(invitation.getStartTime());      //开课时间
+//                            tripDetailDto.setStopTime(invitation.getStopTime());        //结课时间
+//                            tripDetailDto.setCity(invitation.getCity());     //具体上课地点
+//                            Course course1 = courseMapper.findById(invitation.getCourseId());
+//                            if (course1 != null){
+//                                tripDetailDto.setPlace(course.getRoom());       //具体地点
+////                                tripDetailDto.setStartTime(course.getStarttime());      //开课时间
+////                                tripDetailDto.setStopTime(course.getStoptime());        //结课时间
+////                                SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course1.getClassroom()));
+////                                if (sysDictionary != null){
+////                                    tripDetailDto.setCity(sysDictionary.getCodeflagname());     //具体上课地点
+////                                }
+//                            }
+//                            tripDetailDtoList.add(tripDetailDto);
+//                        }
+//                        invitationDto.setInviteList(tripDetailDtoList);
+//                        invitationDto.setAgree(invitation.getAgree());
+//                        if (invitation.getAgree().equals("0")){
+//                            invitationDto.setMessage("等待确认邀请中.....");
+//
+//                            tripTrackingDto.setInvitationAgree("0");
+//                            tripTrackingDto.setInvitationMessage("等待确认邀请中.....");
+//                        }
+//                        if (invitation.getAgree().equals("1")){
+//
+//                            tripProgressDto.setAcceptInvitationTime(invitation.getModifyTime());        //接受邀请时间
+//
+//                            invitationDto.setMessage("学院已确认您的操作！");
+//
+//                            tripTrackingDto.setInvitationAgree("1");
+//                            tripTrackingDto.setInvitationMessage("您已接受邀请，学院已确认您的操作！");
+//                        }
+//                        if (invitation.getAgree().equals("2")){
+//
+//                            invitationDto.setMessage("请求更改，请稍等！");
+//                        }
+//                        invitationDtoList.add(invitationDto);
+//                    }
+//                    tripTrackingDto.setInvitationList(invitationDtoList);
+//
+//                }
 
                 if (courseAudit.getFirstAudit().equals("2")){
                     tripTrackingDto.setInvitationAgree("2");
@@ -336,7 +419,7 @@ public class TripServiceImpl implements TripService {
                     tripTrackingDto.setBoardAndLodgingMessage("等待食宿确认中......");
                 }else if (trip.getBoardAndLodging().equals("1")){     //需要学院安排食宿
 
-                    tripTrackingDto.setNeedBoardAndLodging("1");        //未确认
+                    tripTrackingDto.setNeedBoardAndLodging("1");        //需要
                     tripTrackingDto.setBoardAndLodgingMessage("本次行程需要安排食宿");
 
                     List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
@@ -358,9 +441,31 @@ public class TripServiceImpl implements TripService {
                         }
                         tripTrackingDto.setBoardAndLodgingList(tripDetailDtoList);
                     }
-                }else {
-                    tripTrackingDto.setNeedBoardAndLodging("2");        //未确认
+                }else if (trip.getBoardAndLodging().equals("2")){
+                    tripTrackingDto.setNeedBoardAndLodging("2");        //不需要
                     tripTrackingDto.setBoardAndLodgingMessage("本次行程不需要安排食宿！");
+                }else {
+                    tripTrackingDto.setNeedBoardAndLodging("3");        //已安排
+                    tripTrackingDto.setBoardAndLodgingMessage("已为本次行程安排食宿！");
+                    List<TripDetailDto> tripDetailDtoList = new ArrayList<>();
+
+                    List<BoardAndLodging> boardAndLodgingList = boardAndLodgingMapper.findByTripId(trip.getId());
+
+                    if (!boardAndLodgingList.isEmpty()){
+                        for (BoardAndLodging boardAndLodging : boardAndLodgingList
+                        ) {
+                            TripDetailDto tripDetailDto = new TripDetailDto();
+
+                            tripDetailDto.setId(boardAndLodging.getId());       //食宿表ID
+                            tripDetailDto.setCity(boardAndLodging.getCity());
+                            tripDetailDto.setPlace(boardAndLodging.getPlace());
+                            tripDetailDto.setStartTime(boardAndLodging.getStartTime());
+                            tripDetailDto.setStopTime(boardAndLodging.getStopTime());
+
+                            tripDetailDtoList.add(tripDetailDto);
+                        }
+                        tripTrackingDto.setBoardAndLodgingList(tripDetailDtoList);
+                    }
                 }
 
 
@@ -474,7 +579,7 @@ public class TripServiceImpl implements TripService {
                         totalEnd = course.getStoptime();
                     }
                 }
-                CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(courseList.get(0).getId()));
+                CourseAudit courseAudit = courseAuditMapper.findByCourseId("'" + String.valueOf(courseList.get(0).getId()) + "'");
                 if (courseAudit != null){
                     courseAudit.setStartCourseTime(totalBegin);
                     courseAudit.setStopCourseTime(totalEnd);
@@ -492,48 +597,65 @@ public class TripServiceImpl implements TripService {
                 return Result.result("ACK","更改内容为空，请重新选择");
             }
 
+            Integer index = 0;
             for (Invitation invitation : invitationList
             ) {
                 invitationMapper.updateAgree("2",invitation.getId());
 
                 LOGGER.info("更改时间，Invitation.agree = 2");
+
+                Course course = courseMapper.findById(invitation.getCourseId());
+                if (course != null){
+//                    course.setStarttime(dto.getClassList().get(index).getStartTime());
+//                    course.setStoptime(dto.getClassList().get(index).getStopTime());
+                    Date startTime = dto.getClassList().get(index).getStartTime();
+
+                    Date stopTime = dto.getClassList().get(index).getStopTime();
+
+//                    courseMapper.updateByPrimaryKey(course);
+                    courseMapper.updateTimeById(course.getId(),startTime,stopTime);
+
+                    LOGGER.info("更新课程：{}",course);
+
+                    index++;
+                }
+
             }
 
-            Course course = courseMapper.findByIds(trip.getCourseIds());
+            Course course = courseMapper.findById(invitationList.get(0).getCourseId());
             if (course != null){
-                courseMapper.deleteInIds(trip.getCourseIds());          //删除原课程内容
+//                courseMapper.deleteInIds(trip.getCourseIds());          //删除原课程内容
+//
+//                for (ClassDto classDto : dto.getClassList()     //新建课程
+//                     ) {
+//                    Course newCourse = course;
+//                    newCourse.setClassroom(String.valueOf(classDto.getCodeFlag()));
+//                    newCourse.setStarttime(classDto.getStartTime());
+//                    newCourse.setStoptime(classDto.getStopTime());
+//
+//                    courseMapper.insertNewCourse(newCourse);
+//
+//                    LOGGER.info("新建课程：{}",newCourse);
+//                }
 
-                //新建课程
-                for (ClassDto classDto : dto.getClassList()
-                     ) {
-                    Course newCourse = course;
-                    newCourse.setClassroom(String.valueOf(classDto.getCodeFlag()));
-                    newCourse.setStarttime(classDto.getStartTime());
-                    newCourse.setStoptime(classDto.getStopTime());
-
-                    courseMapper.insertNewCourse(newCourse);
-
-                    LOGGER.info("新建课程：{}",newCourse);
-                }
-
-                List<Integer> courseIdList = courseMapper.findIdsByNameAndPeriod(course.getName(),course.getPeriod());
-
-                //更改时间，修改trip
-                if (!courseIdList.isEmpty()){
-                    trip.setCourseIds(Transform.listIntegerToString(courseIdList));
-
-                    trip.setModifyTime(new Date());
-
-                    tripMapper.update(trip);
-
-                    LOGGER.info("更改时间，修改trip");
-                }
+//                List<Integer> courseIdList = courseMapper.findIdsByNameAndPeriod(course.getName(),course.getPeriod());
+//
+//                //更改时间，修改trip
+//                if (!courseIdList.isEmpty()){
+//                    trip.setCourseIds(Transform.listIntegerToString(courseIdList));
+//
+//                    trip.setModifyTime(new Date());
+//
+//                    tripMapper.update(trip);
+//
+//                    LOGGER.info("更改时间，修改trip");
+//                }
 
                 //修改课程考核表，状态回到最开始
-                CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(course.getId()));
+                CourseAudit courseAudit = courseAuditMapper.findByCourseId("'" + String.valueOf(course.getId()) + "'");
 
                 if (courseAudit != null){
-                    courseAudit.setCourseIds(Transform.listIntegerToString(courseIdList));
+//                    courseAudit.setCourseIds(Transform.listIntegerToString(courseIdList));
                     courseAudit.setStatus("0");     //状态回到最开始
                     courseAudit.setFirstAudit("0");
                     courseAudit.setFirstAuditTime(null);
@@ -565,7 +687,7 @@ public class TripServiceImpl implements TripService {
                 LOGGER.info("删除课程");
 
                 //删除课程审核表
-                courseAuditMapper.deleteLikeId(String.valueOf(course.getId()));
+                courseAuditMapper.deleteLikeId("'" + String.valueOf(course.getId()) + "'");
 
                 LOGGER.info("删除课程审核表");
 
@@ -612,35 +734,33 @@ public class TripServiceImpl implements TripService {
         if (dto.getNeed().equals("1")){     //需要学院安排食宿
 
             //新建食宿表
-            List<Course> courseList = courseMapper.findInIds(trip.getCourseIds());
-            if (!courseList.isEmpty()){
-                for (Course course : courseList
-                     ) {
-                    BoardAndLodging boardAndLodging = new BoardAndLodging();
-
-                    boardAndLodging.setTripId(trip.getId());
-                    boardAndLodging.setStartTime(course.getStarttime());
-                    boardAndLodging.setStopTime(course.getStoptime());
-                    boardAndLodging.setPlace(course.getRoom());
-
-                    SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course.getClassroom()));
-
-                    if (sysDictionary != null){
-                        boardAndLodging.setCity(sysDictionary.getCodeflagname());
-                    }
-                    boardAndLodging.setCreateTime(new Date());
-
-                    boardAndLodgingMapper.insert(boardAndLodging);
-
-                    LOGGER.info("新建食宿表：{}",boardAndLodging);
-                }
-
-
-            }
+//            List<Course> courseList = courseMapper.findInIds(trip.getCourseIds());
+//            if (!courseList.isEmpty()){
+//                for (Course course : courseList
+//                     ) {
+//                    BoardAndLodging boardAndLodging = new BoardAndLodging();
+//
+//                    boardAndLodging.setTripId(trip.getId());
+//                    boardAndLodging.setStartTime(course.getStarttime());
+//                    boardAndLodging.setStopTime(course.getStoptime());
+//                    boardAndLodging.setPlace(course.getRoom());
+//
+//                    SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course.getClassroom()));
+//
+//                    if (sysDictionary != null){
+//                        boardAndLodging.setCity(sysDictionary.getCodeflagname());
+//                    }
+//                    boardAndLodging.setCreateTime(new Date());
+//
+//                    boardAndLodgingMapper.insert(boardAndLodging);
+//
+//                    LOGGER.info("新建食宿表：{}",boardAndLodging);
+//                }
+//
+//
+//            }
 
             trip.setBoardAndLodging("1");       //需要
-            trip.setBoardAndLodgingTime(new Date());
-            trip.setStatus("2");
             trip.setModifyTime(new Date());
 
         }else {
@@ -700,6 +820,12 @@ public class TripServiceImpl implements TripService {
             procedure.setModifyTime(new Date());
 
             procedureMapper.update(procedure);
+
+            trip.setProcedure("0");
+
+            tripMapper.update(trip);
+
+            LOGGER.info("更新trip,行程材料审核：{}",trip);
 
             responseProcedure = procedure;
         }

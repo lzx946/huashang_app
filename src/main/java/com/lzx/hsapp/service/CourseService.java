@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangdaren on 2018/3/25.
@@ -40,4 +41,6 @@ public interface CourseService {
     Result<CourseTrackingDto> courseTrackingDetail(@RequestBody CourseIdDto dto);
 
     Result<List<FileDto>> uploadCourseFile(UploadCourseFileDto dto);
+
+    Result<String> signInByMap(Map<String, String> model);
 }

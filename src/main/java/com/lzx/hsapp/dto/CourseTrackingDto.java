@@ -44,10 +44,10 @@ public class CourseTrackingDto implements Serializable {
 
     private String academic;            //职称
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date totalBegin;            //总开课时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date totalEnd;              //总结课时间
 
     private List<TeachPointDto> teachPointList;         //教学点列表

@@ -16,9 +16,9 @@ public class PositionUtil {
      * @return
      */
     public static Gps gps84_To_Gcj02(double lat, double lon) {
-        if (outOfChina(lat, lon)) {
-            return null;
-        }
+//        if (outOfChina(lat, lon)) {
+//            return null;
+//        }
         double dLat = transformLat(lon - 105.0, lat - 35.0);
         double dLon = transformLon(lon - 105.0, lat - 35.0);
         double radLat = lat / 180.0 * pi;
@@ -85,6 +85,20 @@ public class PositionUtil {
 
     }
 
+    /**
+     * 84-->(BD-09)
+     * @param lat
+     * @param lon
+     * @return
+     */
+    public static Gps gps84_To_Bd09(double lat, double lon) {
+
+        Gps gcj02 = PositionUtil.gps84_To_Gcj02(lat, lon);
+        Gps bdmap = PositionUtil.gcj02_To_Bd09(gcj02.getWgLat(), gcj02.getWgLon());
+        return bdmap;
+
+    }
+
     public static boolean outOfChina(double lat, double lon) {
         if (lon < 72.004 || lon > 137.8347)
             return true;
@@ -92,6 +106,7 @@ public class PositionUtil {
             return true;
         return false;
     }
+
 
     public static Gps transform(double lat, double lon) {
         if (outOfChina(lat, lon)) {
@@ -130,18 +145,18 @@ public class PositionUtil {
     }
 
 
-    public static void main(String[] args) {
-        // 北斗芯片获取的经纬度为WGS84地理坐标 31.426896,119.496145
-        Gps gps = new Gps(22.77479, 113.73519);
-        System.out.println("gps :" + gps);
-        Gps gcj = gps84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
-        System.out.println("gcj :" + gcj);
-        Gps star = gcj_To_Gps84(gcj.getWgLat(), gcj.getWgLon());
-        System.out.println("star:" + star);
-        Gps bd = gcj02_To_Bd09(gcj.getWgLat(), gcj.getWgLon());
-        System.out.println("bd  :" + bd);
-        Gps gcj2 = bd09_To_Gcj02(bd.getWgLat(), bd.getWgLon());
-        System.out.println("gcj :" + gcj2);
-
-    }
+//    public static void main(String[] args) {
+//        // 北斗芯片获取的经纬度为WGS84地理坐标 31.426896,119.496145
+//        Gps gps = new Gps(22.77479, 113.73519);
+//        System.out.println("gps :" + gps);
+//        Gps gcj = gps84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
+//        System.out.println("gcj :" + gcj);
+//        Gps star = gcj_To_Gps84(gcj.getWgLat(), gcj.getWgLon());
+//        System.out.println("star:" + star);
+//        Gps bd = gcj02_To_Bd09(gcj.getWgLat(), gcj.getWgLon());
+//        System.out.println("bd  :" + bd);
+//        Gps gcj2 = bd09_To_Gcj02(bd.getWgLat(), bd.getWgLon());
+//        System.out.println("gcj :" + gcj2);
+//
+//    }
 }

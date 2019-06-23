@@ -17,6 +17,8 @@ public class BoardAndLodging {
 
     private Integer tripId;         //行程跟踪表ID
 
+    private Integer courseId;       //课程ID
+
     private String city;            //城市
 
     private String place;           //地点
@@ -43,6 +45,14 @@ public class BoardAndLodging {
 
     public void setTripId(Integer tripId) {
         this.tripId = tripId;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
     }
 
     public String getCity() {
@@ -98,6 +108,7 @@ public class BoardAndLodging {
         return "BoardAndLodging{" +
                 "id=" + id +
                 ", tripId=" + tripId +
+                ", courseId=" + courseId +
                 ", city='" + city + '\'' +
                 ", place='" + place + '\'' +
                 ", startTime=" + startTime +

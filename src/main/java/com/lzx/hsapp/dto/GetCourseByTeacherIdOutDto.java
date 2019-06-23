@@ -17,10 +17,10 @@ public class GetCourseByTeacherIdOutDto implements Serializable {
 
     private String status;         //课程状态（0==申请课程；1==审核；2==材料上传；3==开课；4==结课）
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date totalStartTime;         //开始时间
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private Date totalStopTime;          //结束时间
 
     private String period;              //第几期

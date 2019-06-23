@@ -9,6 +9,8 @@ import java.net.URLConnection;
 
 public class GetLocationMsg {
 
+    private static String ak = "KLFFxOn0TuNH15d99PH2e0NGvNvZMSKi";
+
     public final static void main(String[] args) {
 
 		 /*//String jsonStr = GetLocationMs(22.329157, 114.203258);
@@ -30,9 +32,9 @@ public class GetLocationMsg {
 
         String url = String.format(
 
-                "http://ditu.google.cn/maps/api/geocode/json?latlng=%s,%s&language=CN",
+                "http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=%s,%s&output=json&pois=0&latest_admin=1&ak=%s",
 
-                d, f);
+                d, f,ak);
 
         URL myURL = null;
 

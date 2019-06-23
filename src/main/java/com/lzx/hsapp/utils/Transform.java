@@ -29,7 +29,7 @@ public class Transform {
             }else{
                 result.append(",");
             }
-            result.append(string);
+            result.append("'" + string + "'");
         }
         return result.toString();
     }
@@ -55,8 +55,16 @@ public class Transform {
             }else{
                 result.append(",");
             }
-            result.append(integer);
+            result.append("'" + integer + "'");
         }
+
+//        for(Integer integer :list) {
+//
+//            result.append(",");
+//
+//            result.append(integer);
+//        }
+//        result.append(",");
         return result.toString();
     }
 
@@ -66,6 +74,7 @@ public class Transform {
      * @return
      */
     private List<String> stringToList(String strs){
+        strs = strs.replaceAll("'","");
         String str[] = strs.split(",");
         return Arrays.asList(str);
     }

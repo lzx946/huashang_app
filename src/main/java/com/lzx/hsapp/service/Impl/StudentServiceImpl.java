@@ -5,15 +5,20 @@ import com.lzx.hsapp.dao.StudentsinfoMapper;
 import com.lzx.hsapp.entity.StudentsVoinfo;
 import com.lzx.hsapp.entity.Studentsinfo;
 import com.lzx.hsapp.service.StudentService;
-import com.lzx.hsapp.utils.MD5;
-import com.lzx.hsapp.utils.Pagination;
+import com.lzx.hsapp.util.HttpRequest;
+import com.lzx.hsapp.utils.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangdaren on 2018/2/1.
@@ -22,6 +27,9 @@ import java.util.List;
 @Component
 public class StudentServiceImpl implements StudentService {
     Logger logger= LoggerFactory.getLogger(getClass().getName());
+
+    private static String openId = "oPtUv1GDeDvj33qc5egjNq69sk-U";
+
     @Autowired
     private StudentsinfoMapper studentsinfoMapper;
     @Override
@@ -82,5 +90,59 @@ public class StudentServiceImpl implements StudentService {
            e.printStackTrace();
        }
        return 0;
+    }
+
+    @Override
+    public String submitInfo(HttpServletResponse response, Map<String, String> param){
+        String phone = param.get("phone");
+        logger.info("phone:{}",phone);
+        String realName = param.get("realname");
+        logger.info("realName:{}",realName);
+        String weChat = param.get("wechat");
+        logger.info("weChat:{}",weChat);
+        String summary = param.get("summary");
+        logger.info("summary:{}",summary);
+
+        Cookie cookie = new Cookie("openid",weChat);
+        response.addCookie(cookie);
+
+
+        if (StringUtils.isEmpty(weChat)){
+//            logger.info("weChat为空");
+//            return Result.result("NACK","weChat为空");
+            weChat = openId;
+        }
+
+        Studentsinfo studentsinfo = studentsinfoMapper.findByPhone(phone);
+        if (studentsinfo != null){
+            studentsinfo.setRealname(realName);
+            studentsinfo.setWechat(weChat);
+            studentsinfo.setSummary(summary);
+
+            studentsinfoMapper.updateByPrimaryKey(studentsinfo);
+
+            logger.info("提交成功");
+
+            return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "提交成功", studentsinfo);
+        }else {
+            Studentsinfo student = new Studentsinfo();
+            student.setSummary(summary);
+            student.setWechat(weChat);
+            student.setPhone(phone);
+            student.setState(1);
+            student.setPassword(MD5.encodeString("000000"));    //默认密码"000000"
+            student.setRealname(realName);
+
+            studentsinfoMapper.insert(student);
+
+            Studentsinfo newStudent = studentsinfoMapper.findByPhone(phone);
+
+            logger.info("插入学员数据：{}",student);
+            return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "提交成功", newStudent);
+        }
+
+//        return Result.result("NACK","提交失败");
+
+
     }
 }

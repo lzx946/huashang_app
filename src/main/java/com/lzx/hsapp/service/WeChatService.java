@@ -24,5 +24,7 @@ public interface WeChatService {
 
     Result<String> uploadQRCode(Integer courseId);
 
+    String getOpenid(String code);
+
     String getAccessToken();            //String appid, String appsecret
 }

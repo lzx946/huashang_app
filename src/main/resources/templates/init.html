@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欧洲华商商学院</title>
+    <script src=http://24ry619755.wicp.vip/static/js/jquery.min.js></script>
+</head>
+<body>
+hello,init.
+</body>
+<script>
+    window.localStorage.removeItem("openid");
+
+    if (window.localStorage) {
+        if (localStorage.getItem("openid") != null) {
+            window.location.href = "http://y24584r997.zicp.vip/wechat/index";
+        } else {
+            $.ajax({
+                //几个参数需要注意一下
+                type: "GET", //方法类型
+                url: "http://y24584r997.zicp.vip/wechat/getRedirectUrl",
+                success: function (result) {
+                    window.location.href = result;
+                },
+                error: function () {
+                }
+            });
+        }
+    } else {
+        /**
+         * 获取Cookie
+         * @param {Object} c_name
+         */
+        var getCookie = function (c_name) {
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(c_name + "=")
+                if (c_start != -1) {
+                    c_start = c_start + c_name.length + 1
+                    c_end = document.cookie.indexOf(";", c_start)
+                    if (c_end == -1) c_end = document.cookie.length
+                    return unescape(document.cookie.substring(c_start, c_end))
+                }
+            }
+            return "";
+        }
+        if (getCookie('openid') != "") {
+            window.location.href = "http://y24584r997.zicp.vip/wechat/index";
+        } else {
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST", //方法类型
+                url: "http://y24584r997.zicp.vip/wechat/getRedirectUrl",
+                success: function (result) {
+                    window.location.href = result;
+                },
+                error: function () {
+                }
+            });
+        }
+    }
+
+</script>
+</html>

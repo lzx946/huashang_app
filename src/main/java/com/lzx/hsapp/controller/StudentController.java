@@ -5,21 +5,22 @@ import com.lzx.hsapp.entity.StudentsVoinfo;
 import com.lzx.hsapp.entity.Studentsinfo;
 import com.lzx.hsapp.service.LoginRegisterService;
 import com.lzx.hsapp.service.StudentService;
-import com.lzx.hsapp.utils.ActionUtil;
-import com.lzx.hsapp.utils.Pagination;
-import com.lzx.hsapp.utils.webUtil;
+import com.lzx.hsapp.service.WeChatService;
+import com.lzx.hsapp.util.weChatWebAccess.HttpsClient;
+import com.lzx.hsapp.util.weChatWebAccess.Response;
+import com.lzx.hsapp.utils.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangdaren on 2018/2/1.
@@ -33,6 +34,12 @@ public class StudentController {
     private StudentService studentService;
     @Autowired
     private LoginRegisterService loginRegisterService;
+
+    @Autowired
+    private WeChatService weChatService;
+
+    @Autowired
+    private HttpsClient httpsClient;
 
     /**
      * 获取学员列表及详情
@@ -174,5 +181,44 @@ public class StudentController {
             else {
                 return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "找回密码成功", flag);
             }
+    }
+
+    @RequestMapping(value = "/weChat/submitInfo",method = RequestMethod.POST)
+    @ResponseBody
+    public String submitInfo(HttpServletRequest request,HttpServletResponse response){
+
+//            String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxf58544e27a43135f&redirect_uri=http://y24584r997.zicp.vip/weChat/getOpenId&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
+//            try {
+////                String result = HttpRequestUtil.defaultConnection("GET",url,5000,5000,null);
+//
+//                Response result = httpsClient.get(url);
+//
+//                logger.info("result:{}",result);
+//                logger.info(result.asString());
+//                logger.info(String.valueOf(result.asJSONObject()));
+//                return Result.success();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            return Result.result("NACK","提交失败");
+
+        String phone = request.getParameter("phone");
+        logger.info("phone:{}",phone);
+        String realname = request.getParameter("realname");
+        logger.info("realname:{}",realname);
+        String wechat = request.getParameter("wechat");
+        logger.info("wechat:{}",wechat);
+        String summary = request.getParameter("summary");
+        logger.info("summary:{}",summary);
+
+        Map<String,String> param = new HashMap<>();
+
+        param.put("phone",phone);
+        param.put("realname",realname);
+        param.put("wechat",wechat);
+        param.put("summary",summary);
+
+        return studentService.submitInfo(response,param);
+
     }
 }

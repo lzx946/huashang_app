@@ -36,6 +36,8 @@ public class EnlistController {
         response.setHeader("Access-Control-Allow-Origin", ActionUtil.CrossDomain);
         String cid = request.getParameter("courseid");
         String uid = request.getParameter("userid");
+        logger.info("courseId:{}",cid);
+        logger.info("userId:{}",uid);
         Enlist enlist = new Enlist();
         try {
             if (cid != null && uid != null) {

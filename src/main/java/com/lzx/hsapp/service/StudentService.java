@@ -3,9 +3,12 @@ package com.lzx.hsapp.service;
 import com.lzx.hsapp.entity.StudentsVoinfo;
 import com.lzx.hsapp.entity.Studentsinfo;
 import com.lzx.hsapp.utils.Pagination;
+import com.lzx.hsapp.utils.Result;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangdaren on 2018/2/1.
@@ -39,4 +42,6 @@ public interface StudentService {
      * @return
      */
     int updateByPrimaryKey(Studentsinfo record);
+
+    String submitInfo(HttpServletResponse response, Map<String, String> param);
 }

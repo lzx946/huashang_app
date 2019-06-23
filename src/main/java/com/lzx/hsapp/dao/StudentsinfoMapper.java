@@ -37,4 +37,7 @@ public interface StudentsinfoMapper {
 
     @Select("select * from studentsinfo where id = #{id}")
     Studentsinfo findById(@Param("id") Integer id);
+
+    @Select("select * from studentsinfo where phone = #{phone} and state = 1")
+    Studentsinfo findByPhone(@Param("phone") String phone);
 }

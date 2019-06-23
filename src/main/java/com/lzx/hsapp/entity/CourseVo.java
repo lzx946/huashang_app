@@ -14,6 +14,8 @@ public class CourseVo extends Course {
     private String totalbegin;
     private String totalend;
 
+    private String qrCodeUrl;      //微信报名二维码
+
     public Long getEndtime() {
         return endtime;
     }
@@ -90,5 +92,13 @@ public class CourseVo extends Course {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getQrCodeUrl() {
+        return qrCodeUrl;
+    }
+
+    public void setQrCodeUrl(String qrCodeUrl) {
+        this.qrCodeUrl = qrCodeUrl;
     }
 }

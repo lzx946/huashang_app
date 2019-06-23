@@ -84,14 +84,14 @@ public class ExpertServiceImpl implements ExpertService {
     @Override
     public boolean updateByPrimaryKey(Expertsinfo record) {
         try {
-            if(record.getPassword()!=null){
-                record.setPassword(MD5.encodeString(record.getPassword()));
-            }
+//            if(record.getPassword()!=null){
+//                record.setPassword(MD5.encodeString(record.getPassword()));
+//            }
             int flag = expertsinfoMapper.updateByPrimaryKey(record);
             if (flag == 1) {                return true;
             }
         } catch (Exception e) {
-            logger.error("更新专家信息失败" + e.getMessage());
+            logger.error("" + e.getMessage());
             e.printStackTrace();
         }
         return false;

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <meta name=description content="">
+    <meta name=author content="">
+    <link rel=icon href=../../img/logo.a90001e.png>
+    <title>欧洲华商商学院</title>
+    <link rel=stylesheet href=http://24ry619755.wicp.vip/static/css/bootstrap.min.css>
+    <link href=http://24ry619755.wicp.vip/static/css/swiper-4.2.6.min.css rel=stylesheet>
+    <script src=http://24ry619755.wicp.vip/static/js/jquery.min.js></script>
+    <script src=http://24ry619755.wicp.vip/static/js/md5.min.js></script>
+    <script src=http://24ry619755.wicp.vip/static/js/swiper-4.2.6.min.js></script>
+    <script src=http://24ry619755.wicp.vip/static/js/vue.min.js></script>
+    <link href=http://24ry619755.wicp.vip/static/css/app.e2dc8eae3d2049ac20782dbfb81098eb.css rel=stylesheet>
+    <script th:inline="javascript">
+        var openid = [[${openid}]];
+        console.log(openid);
+        if(openid!=null) {
+            if (window.localStorage) {
+                window.localStorage.setItem("openid", openid);
+            } else {
+                var setCookie = function (c_name, value, expiredays) {
+                    var exdate = new Date()
+                    exdate.setDate(exdate.getDate() + expiredays)
+                    document.cookie = c_name + "=" + escape(value) +
+                        ((expiredays == null) ? "" : ";expires=" + exdate.toGMTString())
+                };
+                setCookie('openid', openid, 360);
+            }
+        }
+    </script>
+</head>
+
+<body>
+<div id=app>
+    <router-view></router-view>
+</div>
+
+<script type=text/javascript src=http://24ry619755.wicp.vip/static/js/manifest.3ad1d5771e9b13dbdad2.js></script>
+<script type=text/javascript src=http://24ry619755.wicp.vip/static/js/vendor.def6a0aae5504546b817.js></script>
+<script type=text/javascript src=http://24ry619755.wicp.vip/static/js/app.6060333214deb2b1447a.js></script>
+
+
+</body>
+
+</html>

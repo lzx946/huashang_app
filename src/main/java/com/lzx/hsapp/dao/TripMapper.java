@@ -33,6 +33,6 @@ public interface TripMapper {
     @Delete("delete from trip where id = #{id}")
     void delete(@Param("id") Integer id);
 
-    @Select("select * from trip where teacher_id = #{teacherId}")
+    @Select("select * from trip where teacher_id = #{teacherId} order by create_time desc")
     List<Trip> findByTeacherId(@Param("teacherId") Integer teacherId);
 }

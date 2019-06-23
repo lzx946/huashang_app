@@ -102,6 +102,9 @@ public class HomeController {
         List<Course> courses=new ArrayList<Course>();
         JSONArray jsonArray = JSONArray.fromObject(info);
         String maxPeriod = courseService.getMaxPeriodByName(name);
+        if (maxPeriod == null){     //如果为空表示第一次开课，赋0值
+            maxPeriod = "0";
+        }
         Integer period = Integer.valueOf(maxPeriod) + 1;
         for(int i=0;i<jsonArray.size();i++){
             Course course=new Course();
@@ -121,9 +124,9 @@ public class HomeController {
             courses.add(course);
        }
        try{
-           boolean flag= homeDataService.insertBatch(courses);
-           boolean createCourseAudit = courseService.createCourseAuditByCourseName(name,String.valueOf(period));
-           boolean createTrip = tripService.createTripByCourseName(name,String.valueOf(period));
+           boolean flag= homeDataService.insertBatch(courses);      //创建课程
+           boolean createCourseAudit = courseService.createCourseAuditByCourseName(name,String.valueOf(period));        //创建课程考核表
+           boolean createTrip = tripService.createTripByCourseName(name,String.valueOf(period));        //创建行程跟踪表
            if(flag==true && createCourseAudit==true && createTrip==true){
 
                return webUtil.result(webUtil.FLAG_SUCCESS, webUtil.ERROR_CODE_SUCCESS, "课程提交成功", flag);

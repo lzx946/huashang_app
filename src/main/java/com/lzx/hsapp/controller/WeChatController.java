@@ -5,10 +5,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lzx.hsapp.constant.Constant;
 import com.lzx.hsapp.entity.AccessToken;
+import com.lzx.hsapp.entity.Studentsinfo;
 import com.lzx.hsapp.entity.msg.Message;
-import com.lzx.hsapp.service.EnlistService;
-import com.lzx.hsapp.service.WeChatService;
-import com.lzx.hsapp.service.WxEventService;
+import com.lzx.hsapp.service.*;
 import com.lzx.hsapp.service.msg.IMsgService;
 
 import com.lzx.hsapp.util.SignUtil;
@@ -19,6 +18,10 @@ import com.lzx.hsapp.util.mapUtil.GetLocationMsg;
 import com.lzx.hsapp.util.mapUtil.Gps;
 import com.lzx.hsapp.util.mapUtil.PositionUtil;
 import com.lzx.hsapp.util.mapUtil.UserDetails;
+import com.lzx.hsapp.util.weChatWebAccess.Configuration;
+import com.lzx.hsapp.util.weChatWebAccess.OAuth2;
+import com.lzx.hsapp.util.weChatWebAccess.OAuth2Token;
+import com.lzx.hsapp.util.weChatWebAccess.WeixinExtend;
 import com.lzx.hsapp.utils.CheckOutUtil;
 import com.lzx.hsapp.utils.HttpRequestUtil;
 import com.lzx.hsapp.utils.Result;
@@ -33,6 +36,8 @@ import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +52,7 @@ import java.util.Map;
 /**
  * 微信接入
  */
-@RestController
+@Controller
 @RequestMapping("/wechat")
 @CrossOrigin(origins = "*")
 public class WeChatController {
@@ -58,10 +63,13 @@ public class WeChatController {
     private WeChatService weChatService;
 
     @Autowired
-    private EnlistService enlistService;
+    private CourseService courseService;
 
     @Autowired
     private WxEventService wxEventService;
+
+    @Autowired
+    private StudentService studentService;
 
     @Autowired
     private Message message;
@@ -283,45 +291,221 @@ public class WeChatController {
 
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     @ResponseBody
-    public Result<String> signIn(@RequestBody Map<String, String> model) {              //, HttpServletRequest request
-//        String latitude = request.getParameter("latitude");
-//        String longitude = request.getParameter("longitude");
-        String latitude = model.get("latitude");
-        String longitude = model.get("longitude");
-        Integer studentId = Integer.valueOf(model.get("studentId"));
-        Integer courseId = Integer.valueOf(model.get("courseId"));
-        System.out.println(latitude);
-        System.out.println(longitude);
-        if (latitude!=null & longitude!=null) {
-            double lat = Double.valueOf(latitude).doubleValue();
-            double lon = Double.valueOf(longitude).doubleValue();
+    public Result<String> signIn(@RequestBody Map<String, String> model) {
 
-            // 微信是GPS需要转化地图
-            Gps gps = new Gps(lat, lon);
-            LOGGER.info("gps:{}",gps);
-            Gps gcj = PositionUtil.gps84_To_Gcj02(gps.getWgLat(), gps.getWgLon());
-            LOGGER.info("gcj:{}",gcj);
-            String jsonStr = GetLocationMsg.GetLocationMs(gcj.getWgLat(), gcj.getWgLon());
-            LOGGER.info("jsonStr:{}",jsonStr);
-
-            // 因为嵌套太多先解析
-            JSONObject jsonObj = JSONArray.parseObject(jsonStr);
-            JSONArray jsonArray = (JSONArray) jsonObj.get("results");
-            List list = new ArrayList();// 用list保存全部数据
-            for (int i = 0; i < jsonArray.size(); i++) {
-                UserDetails user = (UserDetails) JSONObject.toJavaObject(jsonArray.getJSONObject(i), UserDetails.class);
-                // System.out.println(user.toString());
-                list.add(user.getFormatted_address());
-            }
-            String json = JSON.toJSONString(list); // list转json
-            LOGGER.info("json:{}",json);
-            System.out.println(json);
-            // 页面上
-//            return json;
-            return enlistService.signIn(courseId,studentId);
-        }else {
-            return Result.result("NACK","未获取到位置信息");
-        }
+        return courseService.signInByMap(model);
 
     }
+
+    @RequestMapping({"/index"})
+    /*     */ public String index(HttpServletResponse response, Model model, @RequestParam(name = "code", required = false) String code, @RequestParam(name = "state", required = false) String state) {
+        /*  68 */
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        /*  69 */
+        if ((code != null) && (!code.trim().equals(""))) {
+            /*  70 */
+            OAuth2 oAuth2 = new OAuth2();
+            /*     */
+            try {
+                /*  72 */
+                OAuth2Token oAuth2Token = oAuth2.login(Configuration.getOAuthAppId(), Configuration.getOAuthSecret(), code);
+                /*  73 */
+                model.addAttribute("openid", oAuth2Token.getOpenid());
+                /*  74 */
+                LOGGER.info("获取的openid值为：" + oAuth2Token.getOpenid());
+                /*     */
+            } catch (Exception e) {
+                /*  76 */
+                LOGGER.error("获取openid失败");
+                /*  77 */
+                e.printStackTrace();
+                /*     */
+            }
+            /*     */
+        }
+        /*  80 */
+        return "weindex";
+        /*     */
+    }
+
+    /*     */
+    /*     */
+    @RequestMapping({"/getRedirectUrl"})
+    /*     */
+    @ResponseBody
+    /*     */ public String getRedirectUrl(HttpServletResponse response) {
+        /*  86 */
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        /*  87 */
+        WeixinExtend weixinExtend = new WeixinExtend();
+        /*  88 */
+        String url = null;
+        /*  89 */
+        url = weixinExtend.code();
+        /*  90 */
+        LOGGER.info("获取url连接:" + url);
+        /*  91 */
+        return url;
+        /*     */
+    }
+
+    /*     */
+    /*     */
+    @RequestMapping({"/init"})
+    /*     */ public String init() {
+        /*  96 */
+        LOGGER.info("初始化界面");
+        /*  97 */
+        return "init";
+        /*     */
+    }
+
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+//    @RequestMapping({"/submitInfo"})
+//    /*     */
+//    @ResponseBody
+//    /*     */ public String submitInfo(HttpServletResponse response, Studentsinfo studentsinfo)
+//    /*     */ {
+//        /* 109 */
+//        response.setHeader("Access-Control-Allow-Origin", "*");
+//        /* 110 */
+//        if ((studentsinfo.getWechat() == null) || (studentsinfo.getWechat().trim().equals(""))) {
+//            /* 111 */
+//            return WebUtil.results(0, "0002", "OPENID为空", null);
+//            /*     */
+//        }
+//        /* 113 */
+//        if ((studentsinfo.getRealname() == null) || (studentsinfo.getRealname().trim().equals(""))) {
+//            /* 114 */
+//            return WebUtil.results(0, "0002", "getRealname为空", null);
+//            /*     */
+//        }
+//        /* 116 */
+//        if ((studentsinfo.getPhone() == null) || (studentsinfo.getPhone().trim().equals(""))) {
+//            /* 117 */
+//            return WebUtil.results(0, "0002", "getPhone为空", null);
+//            /*     */
+//        }
+//        /* 119 */
+//        if ((studentsinfo.getSummary() == null) || (studentsinfo.getSummary().trim().equals(""))) {
+//            /* 120 */
+//            return WebUtil.results(0, "0002", "getSummary为空", null);
+//            /*     */
+//        }
+//        /*     */
+//        /* 123 */
+//        Studentsinfo studentsinfo1 = this.studentsinfoService.selectByPhone(studentsinfo.getPhone());
+//        /* 124 */
+//        if (studentsinfo1 != null) {
+//            /* 125 */
+//            if ((studentsinfo1.getWechat() == null) || (studentsinfo1.getWechat().equals(""))) {
+//                /* 126 */
+//                this.studentsinfoService.updateByPhone(studentsinfo);
+//                /* 127 */
+//                Studentsinfo studentsinfo3 = this.studentsinfoService.selectByPrimaryKey(studentsinfo.getWechat());
+//                /* 128 */
+//                this.logger.info(studentsinfo3 != null ? studentsinfo3.getPhone() : "值为空");
+//                /* 129 */
+//                return WebUtil.results(1, "1000", "保存成功", studentsinfo3);
+//            }
+//            /* 130 */
+//            if (!studentsinfo.getWechat().equals(studentsinfo1.getWechat())) {
+//                /* 131 */
+//                return WebUtil.results(0, "0003", "此手机号已绑定到其他微信账号", null);
+//                /*     */
+//            }
+//            /* 133 */
+//            this.studentsinfoService.updateByPhone(studentsinfo);
+//            /* 134 */
+//            Studentsinfo studentsinfo3 = this.studentsinfoService.selectByPrimaryKey(studentsinfo.getWechat());
+//            /* 135 */
+//            this.logger.info(studentsinfo3 != null ? studentsinfo3.getPhone() : "值为空");
+//            /* 136 */
+//            return WebUtil.results(1, "1000", "保存成功", studentsinfo3);
+//            /*     */
+//        }
+//        /*     */
+//        /* 139 */
+//        Studentsinfo studentsinfo2 = this.studentsinfoService.selectByPrimaryKey(studentsinfo.getWechat());
+//        /* 140 */
+//        if (studentsinfo2 != null) {
+//            /* 141 */
+//            this.studentsinfoService.updateByPrimaryKey(studentsinfo);
+//            /* 142 */
+//            Studentsinfo studentsinfo3 = this.studentsinfoService.selectByPrimaryKey(studentsinfo.getWechat());
+//            /* 143 */
+//            this.logger.info(studentsinfo3 != null ? studentsinfo3.getPhone() : "值为空");
+//            /* 144 */
+//            return WebUtil.results(1, "1000", "保存成功", studentsinfo3);
+//            /*     */
+//        }
+//        /* 146 */
+//        studentsinfo.setPassword(MD5.encodeString("123456"));
+//        /* 147 */
+//        studentsinfo.setArea(Integer.valueOf(0));
+//        /* 148 */
+//        this.studentsinfoService.insert(studentsinfo);
+//        /* 149 */
+//        this.logger.info("插入一条个人信息成功");
+//        /* 150 */
+//        Studentsinfo studentsinfo3 = this.studentsinfoService.selectByPrimaryKey(studentsinfo.getWechat());
+//        /* 151 */
+//        this.logger.info(studentsinfo3 != null ? studentsinfo3.getPhone() : "值为空");
+//        /* 152 */
+//        return WebUtil.results(1, "1000", "插入信息成功", studentsinfo3);
+//        /*     */
+//    }
+
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+    /*     */
+//    @RequestMapping({"/enter"})
+//    /*     */
+//    @ResponseBody
+//    /*     */ public String enter(HttpServletResponse response, @RequestParam(name = "openid", required = true) String openid)
+//    /*     */ {
+//        /* 174 */
+//        response.setHeader("Access-Control-Allow-Origin", "*");
+//        /* 175 */
+//        if ((openid != null) && (!openid.trim().equals(""))) {
+//            /* 176 */
+//            Studentsinfo studentsinfo = this.studentsinfoService.selectByPrimaryKey(openid);
+//            /* 177 */
+//            if (studentsinfo != null) {
+//                /* 178 */
+//                this.logger.info("获取个人信息成功");
+//                /* 179 */
+//                return WebUtil.results(1, "0000", "获取信息成功", studentsinfo);
+//                /*     */
+//            }
+//            /* 181 */
+//            return WebUtil.results(1, "1000", "新用户", null);
+//            /*     */
+//        }
+//        /*     */
+//        /* 184 */
+//        return WebUtil.results(0, "0002", "OPENID为空", null);
+//        /*     */
+//    }
+
 }

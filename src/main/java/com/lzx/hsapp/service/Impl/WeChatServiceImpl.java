@@ -13,6 +13,9 @@ import com.lzx.hsapp.service.CourseQRCodeService;
 import com.lzx.hsapp.service.FileService;
 import com.lzx.hsapp.service.WeChatService;
 import com.lzx.hsapp.util.HttpRequest;
+import com.lzx.hsapp.util.weChatWebAccess.Configuration;
+import com.lzx.hsapp.util.weChatWebAccess.OAuth2;
+import com.lzx.hsapp.util.weChatWebAccess.OAuth2Token;
 import com.lzx.hsapp.utils.HttpRequestUtil;
 import com.lzx.hsapp.utils.Result;
 import com.lzx.hsapp.utils.WeiXinResult;
@@ -25,7 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -303,6 +309,31 @@ public class WeChatServiceImpl implements WeChatService {
             return Result.result("NACK","获取二维码失败");
         }
         return Result.result("NACK","获取ticket失败");
+    }
+
+    @Override
+    public String getOpenid(String code) {
+        String openId = null;
+        if ((code != null) && (!code.trim().equals(""))) {
+            OAuth2 oAuth2 = new OAuth2();
+            try {
+                OAuth2Token oAuth2Token = oAuth2.login(Configuration.getOAuthAppId(), Configuration.getOAuthSecret(), code);
+
+                openId = oAuth2Token.getOpenid();
+
+                LOGGER.info("获取的openid值为：" + oAuth2Token.getOpenid());
+            } catch (Exception e) {
+
+                LOGGER.error("获取openid失败");
+
+                e.printStackTrace();
+
+            }
+
+        }
+
+        return openId;
+
     }
 
     @Scheduled(cron = "0 0 0/1 * * ?")

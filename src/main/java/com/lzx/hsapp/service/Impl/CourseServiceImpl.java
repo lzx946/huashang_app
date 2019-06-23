@@ -1,5 +1,7 @@
 package com.lzx.hsapp.service.Impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
@@ -7,21 +9,24 @@ import com.lzx.hsapp.dao.*;
 import com.lzx.hsapp.dto.*;
 import com.lzx.hsapp.entity.*;
 import com.lzx.hsapp.service.CourseService;
+import com.lzx.hsapp.service.EnlistService;
 import com.lzx.hsapp.service.SysDictonaryService;
+import com.lzx.hsapp.service.WeChatService;
+import com.lzx.hsapp.util.mapUtil.GetLocationMsg;
+import com.lzx.hsapp.util.mapUtil.Gps;
+import com.lzx.hsapp.util.mapUtil.PositionUtil;
 import com.lzx.hsapp.utils.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by wangdaren on 2018/3/25.
@@ -64,6 +69,15 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private StudentsinfoMapper studentsinfoMapper;
+
+    @Autowired
+    private EnlistService enlistService;
+
+    @Autowired
+    private CourseQRCodeMapper courseQRCodeMapper;
+
+    @Autowired
+    private WeChatService weChatService;
 
     @Override
     public List<CourseVo> selectByteach(CourseVo courseVo) {
@@ -124,6 +138,19 @@ public class CourseServiceImpl implements CourseService {
                        }
                         list.add(courses.get(j).getStarttime());
                         list.add(courses.get(j).getStoptime());
+
+                        //添加微信报名二维码
+                        CourseQRCode courseQRCode = courseQRCodeMapper.findByCourseId(courses.get(j).getId());
+
+                        LOGGER.info("courseQRCode:{}",courseQRCode);
+
+                        if (courseQRCode != null){
+                            SysFile sysFile = sysFileMapper.selectByPrimaryKey(courseQRCode.getQrCode());
+                            LOGGER.info("sysFile:{}",sysFile);
+                            if (sysFile != null){
+                                courses.get(j).setQrCodeUrl(preview + sysFile.getUrl());
+                            }
+                        }
                     }
                     Date max=list.get(0);
                     Date min=list.get(0);
@@ -213,7 +240,7 @@ public class CourseServiceImpl implements CourseService {
             getCourseByTeacherIdOutDto.setSummary(course.getSummary());
 
             //课程审核状态
-            CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(course.getId()));
+            CourseAudit courseAudit = courseAuditMapper.findByCourseId("'" + String.valueOf(course.getId()) + "'");
 
             if (courseAudit != null){
                 getCourseByTeacherIdOutDto.setStatus(courseAudit.getStatus());
@@ -273,8 +300,9 @@ public class CourseServiceImpl implements CourseService {
     public Result<List<MyCourseListOutDto>> getMyCourseList(MyCourseListDto dto){
 
         if (dto.getStudentId() == null){
-            LOGGER.info("studentId为空");
-            return Result.result("NACK","studentId为空" );
+//            LOGGER.info("studentId为空");
+//            return Result.result("NACK","studentId为空" );
+            dto.setStudentId(26);
         }
         List<MyCourseListOutDto> myCourseListOutDtoList = new ArrayList<>();
 
@@ -403,10 +431,10 @@ public class CourseServiceImpl implements CourseService {
             }
             CourseTrackingDto courseTrackingDto = new CourseTrackingDto();
 
-            CourseAudit courseAudit = courseAuditMapper.findByCourseId(String.valueOf(course.getId()));
+            CourseAudit courseAudit = courseAuditMapper.findByCourseId("'" + String.valueOf(course.getId()) + "'");
 
             if (courseAudit != null){
-                courseTrackingDto.setStatus(courseAudit.getStatus());
+                courseTrackingDto.setStatus(courseAudit.getStatus());       //课程状态
                 courseTrackingDto.setApplyTime(courseAudit.getCreateTime());        //申请开课时间
                 courseTrackingDto.setAuditMessage("您好！您申请的"+ course.getName() +"课程有新动态，请前往行程跟踪接受邀请。");
                 courseTrackingDto.setAuditTime(new Date());
@@ -487,7 +515,7 @@ public class CourseServiceImpl implements CourseService {
             courseTrackingDto.setTeachPointList(teachPointDtoList);
 
             //文件材料
-            List<CourseFile> courseFileList = courseFileMapper.findByCourseId(String.valueOf(course.getId()));
+            List<CourseFile> courseFileList = courseFileMapper.findByCourseId("'" + String.valueOf(course.getId()) + "'");
             if (courseFileList.isEmpty()){
                 courseTrackingDto.setFileList(Collections.EMPTY_LIST);
             }else {
@@ -582,13 +610,13 @@ public class CourseServiceImpl implements CourseService {
 
             LOGGER.info("添加courseFile：{}",courseFile);
         }
-        List<CourseFile> courseFileList = courseFileMapper.findByCourseId(String.valueOf(course.getId()));
+        List<CourseFile> courseFileList = courseFileMapper.findByCourseId("'" + String.valueOf(course.getId()) + "'");
         if (courseFileList != null){
             List<FileDto> fileDtoList = new ArrayList<>();
             int i = 1;
             for (CourseFile courseFile : courseFileList
                  ) {
-                SysFile sysFile = sysFileMapper.selectByPrimaryKey(courseFile.getFileId());
+                SysFile sysFile = sysFileMapper.selectByPrimaryKey(courseFile.getFileId()); //从文件表中查文件url
                 if (sysFile != null){
                     FileDto fileDto = new FileDto();
 
@@ -597,6 +625,8 @@ public class CourseServiceImpl implements CourseService {
                     fileDto.setFileUrl(preview + sysFile.getUrl());
 
                     fileDtoList.add(fileDto);
+
+                    i++;
                 }
             }
             LOGGER.info("上传成功：{}",fileDtoList);
@@ -608,4 +638,128 @@ public class CourseServiceImpl implements CourseService {
 
     }
 
+    @Override
+    public Result<String> signInByMap(Map<String, String> model){
+        String latitude = model.get("latitude");
+        String longitude = model.get("longitude");
+        Integer studentId = Integer.valueOf(model.get("studentId"));
+        Integer courseId = Integer.valueOf(model.get("courseId"));
+        System.out.println(latitude);
+        System.out.println(longitude);
+        if (latitude!=null & longitude!=null) {
+            double lat = Double.valueOf(latitude).doubleValue();
+            double lon = Double.valueOf(longitude).doubleValue();
+
+//            // 微信是GPS需要转化地图
+//            Gps gps = new Gps(lat, lon);
+//            LOGGER.info("gps:{}",gps);
+//            Gps bdmap = PositionUtil.gps84_To_Bd09(gps.getWgLat(), gps.getWgLon());
+//            LOGGER.info("bdmap:{}",bdmap);
+//            String jsonStr = GetLocationMsg.GetLocationMs(bdmap.getWgLat(), bdmap.getWgLon());
+//            LOGGER.info("jsonStr:{}",jsonStr);
+//
+//            String data = jsonStr.substring(jsonStr.indexOf("(") + 1,jsonStr.lastIndexOf(")"));
+//            LOGGER.info("data:{}",data);
+//
+//            // 因为嵌套太多先解析
+//            JSONObject jsonObj = JSON.parseObject(data);
+//
+//            JSONObject object = jsonObj.getJSONObject("result");
+//
+//            String address = object.get("formatted_address").toString();
+//
+//            LOGGER.info("address:{}",address);
+//
+//            JSONObject addressComponent = object.getJSONObject("addressComponent");
+//
+//            String city = addressComponent.getString("city");
+//
+//            LOGGER.info("city:{}",city);
+
+            Course course = courseMapper.findById(courseId);
+
+            if (course != null){
+                SysDictionary sysDictionary = sysDictonaryService.getByCodeFlag(Integer.valueOf(course.getClassroom()));
+
+                if (sysDictionary != null){
+                    if (lat >= sysDictionary.getLatitude() - 1 && lat <= sysDictionary.getLatitude() + 1
+                            && lon >= sysDictionary.getLongitude() - 1 && lon <= sysDictionary.getLongitude() + 1){
+                        return enlistService.signIn(courseId,studentId);
+                    }
+                }
+            }
+
+            return Result.result("NACK","当前位置不在签到范围内");
+        }else {
+            return Result.result("NACK","未获取到位置信息");
+        }
+    }
+
+    @Scheduled(cron = "0 0/1 * * * ?")
+    public void courseBeginAndEnd(){
+
+        Date date = new Date();
+
+        //开课
+        List<CourseAudit> beginCourseAuditList = courseAuditMapper.findByStatus("2");        //课程材料审核成功
+
+        if (!beginCourseAuditList.isEmpty()){
+            for (CourseAudit courseAudit : beginCourseAuditList
+            ) {
+                Course course = courseMapper.findByIds(courseAudit.getCourseIds());
+
+                if (course != null && courseAudit.getStartCourseTime() != null){
+
+                    CourseQRCode courseQRCode = courseQRCodeMapper.findByCourseId(course.getId());
+                    if (courseQRCode == null){
+                        List<Course> courseList = courseMapper.findByNameAndPeriod(course.getName(),course.getPeriod());
+                        if (!courseList.isEmpty()){
+                            for (Course currentCourse : courseList
+                                 ) {
+                                //生成报名二维码
+
+                                weChatService.uploadQRCode(currentCourse.getId());
+
+                                LOGGER.info("生成报名二维码：{}",currentCourse);
+                            }
+                        }
+                    }
+
+                    if (course.getState() == 1 && courseAudit.getStartCourseTime().before(date)){
+                        courseAudit.setStatus("3");             //变为开课状态
+                        courseAudit.setModifyTime(date);
+
+                        courseAuditMapper.update(courseAudit);
+
+                        LOGGER.info("变为开课状态,course：{};courseAudit:{}",course,courseAudit);
+
+                    }
+
+                }
+            }
+        }
+
+        //结课
+        List<CourseAudit> endCourseAuditList = courseAuditMapper.findByStatus("3");        //开课状态
+
+        if (!endCourseAuditList.isEmpty()){
+            for (CourseAudit courseAudit : endCourseAuditList
+            ) {
+                Course course = courseMapper.findByIds(courseAudit.getCourseIds());
+
+                if (course != null && courseAudit.getStopCourseTime() != null){
+                    if (course.getState() == 1 && courseAudit.getStopCourseTime().before(date)){
+                        courseAudit.setStatus("4");             //变为结课状态
+                        courseAudit.setModifyTime(date);
+
+                        courseAuditMapper.update(courseAudit);
+
+                        LOGGER.info("变为结课状态,course：{};courseAudit:{}",course,courseAudit);
+                    }
+
+                }
+            }
+        }
+
+    }
 }

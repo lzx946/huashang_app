@@ -4,6 +4,8 @@ import com.lzx.hsapp.entity.CourseAudit;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Mapper
 @Component
 public interface CourseAuditMapper {
@@ -15,7 +17,7 @@ public interface CourseAuditMapper {
     @Select("select * from course_audit where course_ids like concat('%',#{courseId},'%')")
     CourseAudit findByCourseId(@Param("courseId") String courseId);
 
-    @Update("update course_audit set" +
+    @Update("update course_audit set " +
             "course_ids = #{courseIds}," +
             "status = #{status}," +
             "first_audit = #{firstAudit}," +
@@ -25,10 +27,13 @@ public interface CourseAuditMapper {
             "start_course_time = #{startCourseTime}," +
             "stop_course_time = #{stopCourseTime}," +
             "create_time = #{createTime}," +
-            "modify_time = #{modifyTime}" +
+            "modify_time = #{modifyTime} " +
             "where id = #{id}")
     void update(CourseAudit courseAudit);
 
     @Delete("delete from course_audit where course_ids like concat('%',#{courseId},'%')")
     void deleteLikeId(@Param("courseId") String courseId);
+
+    @Select("select * from course_audit where status = #{status} ")
+    List<CourseAudit> findByStatus(@Param("status") String status);
 }

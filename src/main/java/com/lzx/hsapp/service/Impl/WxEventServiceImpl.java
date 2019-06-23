@@ -130,7 +130,7 @@ public class WxEventServiceImpl implements WxEventService {
                                     article.setPicUrl(preview + sysFile.getUrl());
                                 }
                             }
-                            article.setUrl("http://24ry619755.wicp.vip/weixinphone/newcourse");
+                            article.setUrl("http://24ry619755.wicp.vip/weixinphone/coursed/" + course.getId() + "#f");
                             articleList.add(article);
                             //多图文的话,新建多个article 放入articleList 中即可实现
 

@@ -9,6 +9,12 @@ public class SysDictionary {
 
     private String codeflagname;
 
+    private double latitude;        //纬度
+
+    private double longitude;       //经度
+
+    private String englishName;     //英文名
+
     public Integer getId() {
         return id;
     }
@@ -39,5 +45,29 @@ public class SysDictionary {
 
     public void setCodeflagname(String codeflagname) {
         this.codeflagname = codeflagname == null ? null : codeflagname.trim();
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getEnglishName() {
+        return englishName;
+    }
+
+    public void setEnglishName(String englishName) {
+        this.englishName = englishName;
     }
 }
